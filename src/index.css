@@ -8,89 +8,135 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* AI-style gradient colors - Light Mode */
+    --background: 240 20% 99%;
+    --foreground: 240 10% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 240 10% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 240 10% 10%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Purple-Blue gradient base */
+    --primary: 260 80% 60%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary: Cyan accent */
+    --secondary: 190 90% 50%;
+    --secondary-foreground: 240 10% 10%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Muted: Soft purple-gray */
+    --muted: 240 20% 96%;
+    --muted-foreground: 240 5% 45%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Accent: Pink-purple */
+    --accent: 300 80% 65%;
+    --accent-foreground: 0 0% 100%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --border: 240 20% 90%;
+    --input: 240 20% 94%;
+    --ring: 260 80% 60%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --radius: 0.875rem;
 
-    --radius: 0.5rem;
+    /* Gradient variables */
+    --gradient-purple-blue: linear-gradient(135deg, hsl(260 80% 60%) 0%, hsl(230 80% 65%) 100%);
+    --gradient-blue-cyan: linear-gradient(135deg, hsl(220 80% 60%) 0%, hsl(190 90% 50%) 100%);
+    --gradient-pink-purple: linear-gradient(135deg, hsl(320 80% 65%) 0%, hsl(280 80% 60%) 100%);
+    --gradient-multi: linear-gradient(135deg, hsl(230 80% 65%) 0%, hsl(280 80% 60%) 50%, hsl(320 80% 65%) 100%);
+    
+    /* Status gradients */
+    --gradient-pending: linear-gradient(135deg, hsl(45 90% 55%) 0%, hsl(35 90% 60%) 100%);
+    --gradient-ongoing: linear-gradient(135deg, hsl(220 80% 60%) 0%, hsl(200 85% 55%) 100%);
+    --gradient-completed: linear-gradient(135deg, hsl(140 70% 50%) 0%, hsl(160 70% 55%) 100%);
+    
+    /* Priority gradients */
+    --gradient-low: linear-gradient(135deg, hsl(140 60% 55%) 0%, hsl(160 65% 60%) 100%);
+    --gradient-medium: linear-gradient(135deg, hsl(35 90% 60%) 0%, hsl(25 90% 65%) 100%);
+    --gradient-high: linear-gradient(135deg, hsl(0 80% 60%) 0%, hsl(340 80% 65%) 100%);
 
-    --sidebar-background: 0 0% 98%;
+    /* Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar */
+    --sidebar-background: 240 20% 98%;
+    --sidebar-foreground: 240 10% 20%;
+    --sidebar-primary: 260 80% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 20% 94%;
+    --sidebar-accent-foreground: 260 80% 60%;
+    --sidebar-border: 240 20% 90%;
+    --sidebar-ring: 260 80% 60%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* AI-style gradient colors - Dark Mode with neon accents */
+    --background: 240 15% 8%;
+    --foreground: 240 10% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 240 12% 12%;
+    --card-foreground: 240 10% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 240 12% 12%;
+    --popover-foreground: 240 10% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Primary: Vibrant purple-blue */
+    --primary: 260 90% 65%;
+    --primary-foreground: 240 15% 8%;
+    
+    /* Secondary: Bright cyan */
+    --secondary: 190 95% 55%;
+    --secondary-foreground: 240 15% 8%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Muted: Dark purple-gray */
+    --muted: 240 12% 15%;
+    --muted-foreground: 240 8% 60%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    /* Accent: Neon pink */
+    --accent: 300 90% 70%;
+    --accent-foreground: 240 15% 8%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --destructive: 0 85% 65%;
+    --destructive-foreground: 240 15% 8%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --border: 240 12% 20%;
+    --input: 240 12% 18%;
+    --ring: 260 90% 65%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Gradient variables - Neon in dark mode */
+    --gradient-purple-blue: linear-gradient(135deg, hsl(260 90% 65%) 0%, hsl(230 90% 70%) 100%);
+    --gradient-blue-cyan: linear-gradient(135deg, hsl(220 90% 65%) 0%, hsl(190 95% 55%) 100%);
+    --gradient-pink-purple: linear-gradient(135deg, hsl(320 90% 70%) 0%, hsl(280 90% 65%) 100%);
+    --gradient-multi: linear-gradient(135deg, hsl(230 90% 70%) 0%, hsl(280 90% 65%) 50%, hsl(320 90% 70%) 100%);
+    
+    /* Status gradients - Neon */
+    --gradient-pending: linear-gradient(135deg, hsl(45 95% 60%) 0%, hsl(35 95% 65%) 100%);
+    --gradient-ongoing: linear-gradient(135deg, hsl(220 90% 65%) 0%, hsl(200 90% 60%) 100%);
+    --gradient-completed: linear-gradient(135deg, hsl(140 80% 55%) 0%, hsl(160 80% 60%) 100%);
+    
+    /* Priority gradients - Neon */
+    --gradient-low: linear-gradient(135deg, hsl(140 70% 60%) 0%, hsl(160 75% 65%) 100%);
+    --gradient-medium: linear-gradient(135deg, hsl(35 95% 65%) 0%, hsl(25 95% 70%) 100%);
+    --gradient-high: linear-gradient(135deg, hsl(0 90% 65%) 0%, hsl(340 90% 70%) 100%);
+
+    /* Glassmorphism - Dark */
+    --glass-bg: rgba(30, 30, 40, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.1);
+
+    /* Sidebar - Dark */
+    --sidebar-background: 240 15% 10%;
+    --sidebar-foreground: 240 10% 90%;
+    --sidebar-primary: 260 90% 65%;
+    --sidebar-primary-foreground: 240 15% 8%;
+    --sidebar-accent: 240 12% 18%;
+    --sidebar-accent-foreground: 260 90% 65%;
+    --sidebar-border: 240 12% 20%;
+    --sidebar-ring: 260 90% 65%;
   }
 }
 
@@ -101,5 +147,49 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+}
+
+@layer utilities {
+  .gradient-purple-blue {
+    background: var(--gradient-purple-blue);
+  }
+  
+  .gradient-blue-cyan {
+    background: var(--gradient-blue-cyan);
+  }
+  
+  .gradient-pink-purple {
+    background: var(--gradient-pink-purple);
+  }
+  
+  .gradient-multi {
+    background: var(--gradient-multi);
+  }
+  
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+  }
+  
+  .glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 3s ease infinite;
+  }
+}
+
+@keyframes gradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
   }
 }
