@@ -13,6 +13,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Outfit', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -58,6 +61,18 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      backgroundImage: {
+        'gradient-purple-blue': 'var(--gradient-purple-blue)',
+        'gradient-blue-cyan': 'var(--gradient-blue-cyan)',
+        'gradient-pink-purple': 'var(--gradient-pink-purple)',
+        'gradient-multi': 'var(--gradient-multi)',
+        'gradient-pending': 'var(--gradient-pending)',
+        'gradient-ongoing': 'var(--gradient-ongoing)',
+        'gradient-completed': 'var(--gradient-completed)',
+        'gradient-low': 'var(--gradient-low)',
+        'gradient-medium': 'var(--gradient-medium)',
+        'gradient-high': 'var(--gradient-high)',
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -84,6 +99,9 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "gradient": "gradient 3s ease infinite",
+        "fade-in": "fade-in 0.5s ease-out",
+        "slide-up": "slide-up 0.5s ease-out",
       },
     },
   },
