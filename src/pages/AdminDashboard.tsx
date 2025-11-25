@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { LogOut, User, Plus, Trash2, Edit } from "lucide-react";
+import { LogOut, Plus, Trash2, Bell } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -173,12 +173,14 @@ export default function AdminDashboard() {
           </h1>
           <div className="flex items-center gap-4">
             <Button
-              onClick={() => navigate("/dashboard")}
               variant="outline"
-              className="glass-card hover:bg-gradient-blue-cyan hover:text-white transition-all"
+              size="icon"
+              className="glass-card hover:bg-primary/20 transition-all relative"
             >
-              <User className="mr-2 h-4 w-4" />
-              Student View
+              <Bell className="h-5 w-5" />
+              <span className="absolute -top-1 -right-1 h-4 w-4 bg-destructive rounded-full text-xs flex items-center justify-center text-white">
+                3
+              </span>
             </Button>
             <ThemeToggle />
             <Button
@@ -196,31 +198,31 @@ export default function AdminDashboard() {
       <main className="container mx-auto px-6 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-          <Card className="p-6 glass-card border-2 bg-gradient-purple-blue text-white">
-            <p className="text-sm opacity-90 mb-2">Total Complaints</p>
-            <p className="text-4xl font-bold">{stats.total}</p>
+          <Card className="p-6 glass-card border-2 bg-gradient-purple-blue text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <p className="text-sm opacity-90 mb-3 font-medium">Total Complaints</p>
+            <p className="text-5xl font-bold tracking-tight">{stats.total}</p>
           </Card>
-          <Card className="p-6 glass-card border-2 bg-gradient-pending text-foreground">
-            <p className="text-sm opacity-90 mb-2">Pending</p>
-            <p className="text-4xl font-bold">{stats.pending}</p>
+          <Card className="p-6 glass-card border-2 bg-gradient-pending text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <p className="text-sm opacity-90 mb-3 font-medium">Pending</p>
+            <p className="text-5xl font-bold tracking-tight">{stats.pending}</p>
           </Card>
-          <Card className="p-6 glass-card border-2 bg-gradient-ongoing text-white">
-            <p className="text-sm opacity-90 mb-2">Ongoing</p>
-            <p className="text-4xl font-bold">{stats.ongoing}</p>
+          <Card className="p-6 glass-card border-2 bg-gradient-ongoing text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <p className="text-sm opacity-90 mb-3 font-medium">Ongoing</p>
+            <p className="text-5xl font-bold tracking-tight">{stats.ongoing}</p>
           </Card>
-          <Card className="p-6 glass-card border-2 bg-gradient-completed text-white">
-            <p className="text-sm opacity-90 mb-2">Completed</p>
-            <p className="text-4xl font-bold">{stats.completed}</p>
+          <Card className="p-6 glass-card border-2 bg-gradient-completed text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <p className="text-sm opacity-90 mb-3 font-medium">Completed</p>
+            <p className="text-5xl font-bold tracking-tight">{stats.completed}</p>
           </Card>
-          <Card className="p-6 glass-card border-2 bg-gradient-high text-white">
-            <p className="text-sm opacity-90 mb-2">High Priority</p>
-            <p className="text-4xl font-bold">{stats.high}</p>
+          <Card className="p-6 glass-card border-2 bg-gradient-high text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <p className="text-sm opacity-90 mb-3 font-medium">High Priority</p>
+            <p className="text-5xl font-bold tracking-tight">{stats.high}</p>
           </Card>
         </div>
 
         {/* Categories Management */}
-        <Card className="p-6 glass-card mb-8 border-2">
-          <div className="flex items-center justify-between mb-4">
+        <Card className="p-6 glass-card mb-8 border-2 shadow-lg">
+          <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold gradient-pink-purple gradient-text">
               Manage Categories
             </h2>
@@ -275,7 +277,7 @@ export default function AdminDashboard() {
         </Card>
 
         {/* Complaints Table */}
-        <Card className="glass-card border-2">
+        <Card className="glass-card border-2 shadow-lg">
           <div className="p-6">
             <h2 className="text-2xl font-bold mb-6 gradient-blue-cyan gradient-text">
               All Complaints
