@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function AdminDashboard() {
-  const { signOut } = useAuth();
+  const { signOut, user, userRole } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [complaints, setComplaints] = useState<any[]>([]);
@@ -52,7 +52,19 @@ export default function AdminDashboard() {
       `)
       .order("created_at", { ascending: false });
 
-    if (!error && data) {
+    console.log("Fetch complaints result:", { data, error });
+
+    if (error) {
+      console.error("Error fetching complaints:", error);
+      toast({
+        title: "Error",
+        description: `Failed to fetch complaints: ${error.message}`,
+        variant: "destructive",
+      });
+      setComplaints([]);
+      calculateStats([]);
+    } else if (data) {
+      console.log(`Found ${data.length} complaints`);
       setComplaints(data);
       calculateStats(data);
     }
@@ -168,9 +180,16 @@ export default function AdminDashboard() {
       {/* Header */}
       <header className="border-b glass-card">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold gradient-multi gradient-text">
-            Admin Dashboard
-          </h1>
+          <div>
+            <h1 className="text-2xl font-bold gradient-multi gradient-text">
+              Admin Dashboard
+            </h1>
+            {user && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Logged in as: {user.email} ({userRole})
+              </p>
+            )}
+          </div>
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
