@@ -217,23 +217,23 @@ export default function AdminDashboard() {
       <main className="container mx-auto px-6 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-          <Card className="p-6 glass-card border-2 bg-gradient-purple-blue text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <Card className="p-6 border-2 gradient-purple-blue text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <p className="text-sm opacity-90 mb-3 font-medium">Total Complaints</p>
             <p className="text-5xl font-bold tracking-tight">{stats.total}</p>
           </Card>
-          <Card className="p-6 glass-card border-2 bg-gradient-pending text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <Card className="p-6 border-2 gradient-pending text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <p className="text-sm opacity-90 mb-3 font-medium">Pending</p>
             <p className="text-5xl font-bold tracking-tight">{stats.pending}</p>
           </Card>
-          <Card className="p-6 glass-card border-2 bg-gradient-ongoing text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <Card className="p-6 border-2 gradient-ongoing text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <p className="text-sm opacity-90 mb-3 font-medium">Ongoing</p>
             <p className="text-5xl font-bold tracking-tight">{stats.ongoing}</p>
           </Card>
-          <Card className="p-6 glass-card border-2 bg-gradient-completed text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <Card className="p-6 border-2 gradient-completed text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <p className="text-sm opacity-90 mb-3 font-medium">Completed</p>
             <p className="text-5xl font-bold tracking-tight">{stats.completed}</p>
           </Card>
-          <Card className="p-6 glass-card border-2 bg-gradient-high text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <Card className="p-6 border-2 gradient-high text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <p className="text-sm opacity-90 mb-3 font-medium">High Priority</p>
             <p className="text-5xl font-bold tracking-tight">{stats.high}</p>
           </Card>
