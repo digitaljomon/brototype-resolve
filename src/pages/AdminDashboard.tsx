@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ComplaintDetailsModal } from "@/components/ComplaintDetailsModal";
 
 export default function AdminDashboard() {
   const { signOut, user, userRole } = useAuth();
@@ -31,6 +32,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [newCategory, setNewCategory] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -321,7 +324,14 @@ export default function AdminDashboard() {
                   </TableHeader>
                   <TableBody>
                     {complaints.map((complaint) => (
-                      <TableRow key={complaint.id}>
+                      <TableRow 
+                        key={complaint.id}
+                        className="cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => {
+                          setSelectedComplaint(complaint);
+                          setIsDetailsModalOpen(true);
+                        }}
+                      >
                         <TableCell className="font-medium">
                           {complaint.title}
                         </TableCell>
@@ -334,7 +344,7 @@ export default function AdminDashboard() {
                         <TableCell>
                           <PriorityBadge priority={complaint.priority} />
                         </TableCell>
-                        <TableCell>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
                           <Select
                             value={complaint.status}
                             onValueChange={(value) =>
@@ -365,6 +375,16 @@ export default function AdminDashboard() {
             )}
           </div>
         </Card>
+
+        {/* Complaint Details Modal */}
+        {selectedComplaint && (
+          <ComplaintDetailsModal
+            complaint={selectedComplaint}
+            open={isDetailsModalOpen}
+            onOpenChange={setIsDetailsModalOpen}
+            onUpdate={fetchComplaints}
+          />
+        )}
       </main>
     </div>
   );
