@@ -204,6 +204,30 @@ All colors MUST be HSL.
     background: var(--gradient-multi);
   }
 
+  .gradient-pending {
+    background: var(--gradient-pending);
+  }
+
+  .gradient-ongoing {
+    background: var(--gradient-ongoing);
+  }
+
+  .gradient-completed {
+    background: var(--gradient-completed);
+  }
+
+  .gradient-low {
+    background: var(--gradient-low);
+  }
+
+  .gradient-medium {
+    background: var(--gradient-medium);
+  }
+
+  .gradient-high {
+    background: var(--gradient-high);
+  }
+
   .gradient-text {
     @apply bg-clip-text text-transparent;
   }
