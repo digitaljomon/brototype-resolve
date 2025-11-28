@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { LogOut, Plus, Trash2, Bell } from "lucide-react";
+import { LogOut, Plus, Trash2, Bell, BarChart3 } from "lucide-react";
+import { NavLink } from "@/components/NavLink";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -183,15 +184,21 @@ export default function AdminDashboard() {
       {/* Header */}
       <header className="border-b glass-card">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold gradient-multi gradient-text">
-              Admin Dashboard
-            </h1>
-            {user && (
-              <p className="text-sm text-muted-foreground mt-1">
-                Logged in as: {user.email} ({userRole})
-              </p>
-            )}
+          <div className="flex items-center gap-8">
+            <div>
+              <h1 className="text-2xl font-bold gradient-multi gradient-text">
+                Admin Dashboard
+              </h1>
+              {user && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Logged in as: {user.email} ({userRole})
+                </p>
+              )}
+            </div>
+            <nav className="flex gap-2">
+              <NavLink to="/admin">Dashboard</NavLink>
+              <NavLink to="/admin/analytics">Analytics</NavLink>
+            </nav>
           </div>
           <div className="flex items-center gap-4">
             <Button
