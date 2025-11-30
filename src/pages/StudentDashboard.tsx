@@ -4,13 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { LogOut, FileText, Clock, CheckCircle, AlertCircle, Plus, ArrowRight, Shield } from "lucide-react";
+import { FileText, Clock, CheckCircle, AlertCircle, Plus, ArrowRight } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { format } from "date-fns";
 
 export default function StudentDashboard() {
-  const { user, userRole, signOut } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     total: 0,
@@ -81,38 +80,7 @@ export default function StudentDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      {/* Header */}
-      <header className="border-b glass-card">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold gradient-purple-blue gradient-text">
-            Brototype Complaints
-          </h1>
-          <div className="flex items-center gap-4">
-            {userRole === "admin" && (
-              <Button
-                onClick={() => navigate("/admin")}
-                variant="outline"
-                className="glass-card hover:bg-gradient-purple-blue hover:text-white transition-all"
-              >
-                <Shield className="mr-2 h-4 w-4" />
-                Admin Panel
-              </Button>
-            )}
-            <ThemeToggle />
-            <Button
-              onClick={signOut}
-              variant="outline"
-              size="icon"
-              className="glass-card hover:bg-destructive hover:text-white transition-all"
-            >
-              <LogOut className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-6 py-8">
+    <div className="container mx-auto px-6 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">Welcome Back!</h2>
           <p className="text-muted-foreground">Here's an overview of your complaints</p>
@@ -208,7 +176,6 @@ export default function StudentDashboard() {
             </Card>
           </>
         )}
-      </main>
     </div>
   );
 }

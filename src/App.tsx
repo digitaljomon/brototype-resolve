@@ -14,7 +14,7 @@ import FileComplaint from "./pages/FileComplaint";
 import StudentNotifications from "./pages/StudentNotifications";
 import StudentProfile from "./pages/StudentProfile";
 import StudentHelp from "./pages/StudentHelp";
-import { StudentLayout } from "@/components/StudentLayout";
+import { SimpleStudentLayout } from "@/components/SimpleStudentLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import ComplaintsManagement from "./pages/ComplaintsManagement";
 import AdminAnalytics from "./pages/AdminAnalytics";
@@ -25,87 +25,183 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ThemeProvider>
-          <AuthProvider>
-            <Routes>
-              <Route 
-                path="/" 
-                element={
-                  <ProtectedRoute>
-                    <RoleBasedRedirect />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route path="/auth" element={<Auth />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute requireStudent>
-                    <StudentDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute requireAdmin>
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/complaints"
-                element={
-                  <ProtectedRoute requireAdmin>
-                    <ComplaintsManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/analytics"
-                element={
-                  <ProtectedRoute requireAdmin>
-                    <AdminAnalytics />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/categories"
-                element={
-                  <ProtectedRoute requireAdmin>
-                    <ComplaintCategories />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/users"
-                element={
-                  <ProtectedRoute requireAdmin>
-                    <UserManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/settings"
-                element={
-                  <ProtectedRoute requireAdmin>
-                    <Settings />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AuthProvider>
-        </ThemeProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ThemeProvider>
+            <AuthProvider>
+              <Routes>
+                <Route 
+                  path="/" 
+                  element={
+                    <ProtectedRoute>
+                      <RoleBasedRedirect />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route path="/auth" element={<Auth />} />
+                
+                {/* Student Routes with Simple Layout */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute requireStudent>
+                      <SimpleStudentLayout>
+                        <StudentDashboard />
+                      </SimpleStudentLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/complaints"
+                  element={
+                    <ProtectedRoute requireStudent>
+                      <SimpleStudentLayout>
+                        <StudentComplaints />
+                      </SimpleStudentLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/file-complaint"
+                  element={
+                    <ProtectedRoute requireStudent>
+                      <SimpleStudentLayout>
+                        <FileComplaint />
+                      </SimpleStudentLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/notifications"
+                  element={
+                    <ProtectedRoute requireStudent>
+                      <SimpleStudentLayout>
+                        <StudentNotifications />
+                      </SimpleStudentLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/profile"
+                  element={
+                    <ProtectedRoute requireStudent>
+                      <SimpleStudentLayout>
+                        <StudentProfile />
+                      </SimpleStudentLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/help"
+                  element={
+                    <ProtectedRoute requireStudent>
+                      <SimpleStudentLayout>
+                        <StudentHelp />
+                      </SimpleStudentLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/complaints"
+                  element={
+                    <ProtectedRoute requireStudent>
+                      <StudentComplaints />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/file-complaint"
+                  element={
+                    <ProtectedRoute requireStudent>
+                      <FileComplaint />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/notifications"
+                  element={
+                    <ProtectedRoute requireStudent>
+                      <StudentNotifications />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/profile"
+                  element={
+                    <ProtectedRoute requireStudent>
+                      <StudentProfile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/help"
+                  element={
+                    <ProtectedRoute requireStudent>
+                      <StudentHelp />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/complaints"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <ComplaintsManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/analytics"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <AdminAnalytics />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/categories"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <ComplaintCategories />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/users"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <UserManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/settings"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <Settings />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AuthProvider>
+          </ThemeProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
