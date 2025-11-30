@@ -147,8 +147,12 @@ export default function AdminAnalytics() {
           fill: `hsl(var(--chart-${(idx % 5) + 1}))`,
         }));
 
-        // Priority distribution
-        const priorityCounts = complaints.reduce((acc: any, c: any) => {
+        // Priority distribution - only count active complaints
+        const activeComplaints = complaints.filter(c => 
+          !["resolved", "completed", "closed", "rejected"].includes(c.status)
+        );
+        
+        const priorityCounts = activeComplaints.reduce((acc: any, c: any) => {
           acc[c.priority] = (acc[c.priority] || 0) + 1;
           return acc;
         }, {});
@@ -345,7 +349,7 @@ export default function AdminAnalytics() {
           <Card className="shadow-lg hover:shadow-xl transition-all overflow-hidden">
             <div className="bg-gradient-to-br from-red-500 to-pink-500 p-4 text-white">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-medium opacity-90">High Priority</p>
+                <p className="text-xs font-medium opacity-90">High Priority (Active)</p>
                 <AlertCircle className="h-4 w-4" />
               </div>
               <p className="text-3xl font-bold">
