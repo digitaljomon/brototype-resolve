@@ -70,7 +70,7 @@ export default function Auth() {
       <Card className="w-full max-w-md p-8 glass-card shadow-2xl border-2">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2 gradient-multi gradient-text">
-            Brototype Complaints
+            Brototype Resolve
           </h1>
           <p className="text-muted-foreground">
             {isSignUp ? "Create your account" : "Sign in to your account"}
