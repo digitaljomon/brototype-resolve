@@ -7,9 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FileText, Clock, CheckCircle, AlertCircle, Plus, ArrowRight } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 export default function StudentDashboard() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     total: 0,
@@ -22,7 +24,41 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     fetchData();
+    const cleanup = setupRealtimeSubscription();
+    return cleanup;
   }, [user]);
+
+  const setupRealtimeSubscription = () => {
+    if (!user) return () => {};
+
+    const channel = supabase
+      .channel("student-complaints-updates")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "complaints",
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log("Realtime complaint update:", payload);
+          fetchData();
+          
+          if (payload.eventType === "UPDATE") {
+            toast({
+              title: "Status Updated",
+              description: "One of your complaints has been updated by admin",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  };
 
   const fetchData = async () => {
     if (!user) return;

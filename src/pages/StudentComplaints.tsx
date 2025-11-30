@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,6 +16,7 @@ import { format } from "date-fns";
 export default function StudentComplaints() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [complaints, setComplaints] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,41 @@ export default function StudentComplaints() {
   useEffect(() => {
     fetchComplaints();
     fetchCategories();
+    const cleanup = setupRealtimeSubscription();
+    return cleanup;
   }, [user]);
+
+  const setupRealtimeSubscription = () => {
+    if (!user) return () => {};
+
+    const channel = supabase
+      .channel("student-complaints-list")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "complaints",
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log("Realtime update on complaints list:", payload);
+          fetchComplaints();
+          
+          if (payload.eventType === "UPDATE") {
+            toast({
+              title: "Complaint Updated",
+              description: "A complaint has been updated",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  };
 
   const fetchComplaints = async () => {
     if (!user) return;
