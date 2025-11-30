@@ -61,11 +61,14 @@ export default function ComplaintDetails() {
     if (id) {
       fetchComplaintDetails();
       fetchHistory();
-      setupRealtimeSubscription();
+      const cleanup = setupRealtimeSubscription();
+      return cleanup;
     }
   }, [id]);
 
   const setupRealtimeSubscription = () => {
+    console.log("Setting up realtime subscriptions for complaint:", id);
+    
     // Subscribe to complaint updates
     const complaintChannel = supabase
       .channel(`complaint-${id}`)
@@ -78,7 +81,7 @@ export default function ComplaintDetails() {
           filter: `id=eq.${id}`,
         },
         (payload) => {
-          console.log("Complaint updated:", payload);
+          console.log("✅ Complaint updated:", payload);
           fetchComplaintDetails();
           toast({
             title: "Complaint Updated",
@@ -86,7 +89,9 @@ export default function ComplaintDetails() {
           });
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Complaint subscription status:", status);
+      });
 
     // Subscribe to history updates
     const historyChannel = supabase
@@ -100,7 +105,7 @@ export default function ComplaintDetails() {
           filter: `complaint_id=eq.${id}`,
         },
         (payload) => {
-          console.log("New history entry:", payload);
+          console.log("✅ New history entry:", payload);
           fetchHistory();
           toast({
             title: "New Update",
@@ -108,9 +113,12 @@ export default function ComplaintDetails() {
           });
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("History subscription status:", status);
+      });
 
     return () => {
+      console.log("Cleaning up complaint subscriptions");
       supabase.removeChannel(complaintChannel);
       supabase.removeChannel(historyChannel);
     };
