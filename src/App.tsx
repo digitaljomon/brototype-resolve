@@ -21,6 +21,7 @@ import ComplaintsManagement from "./pages/ComplaintsManagement";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import ComplaintCategories from "./pages/ComplaintCategories";
 import UserManagement from "./pages/UserManagement";
+import AdminManagement from "./pages/AdminManagement";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -154,6 +155,14 @@ function App() {
                   element={
                     <ProtectedRoute requireAdmin>
                       <UserManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/admins"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <AdminManagement />
                     </ProtectedRoute>
                   }
                 />
