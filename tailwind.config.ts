@@ -83,15 +83,16 @@ export default {
   				foreground: 'hsl(var(--card-foreground))'
   			},
   			sidebar: {
-  				DEFAULT: 'hsl(var(--sidebar-background))',
+  				DEFAULT: 'hsl(var(--sidebar))',
   				foreground: 'hsl(var(--sidebar-foreground))',
-  				primary: 'hsl(var(--sidebar-primary))',
-  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-  				accent: 'hsl(var(--sidebar-accent))',
-  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
-  				ring: 'hsl(var(--sidebar-ring))'
-  			}
+  				accent: 'hsl(var(--sidebar-accent))',
+  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))'
+  			},
+  			'neon-blue': 'hsl(var(--neon-blue))',
+  			'neon-purple': 'hsl(var(--neon-purple))',
+  			'neon-aqua': 'hsl(var(--neon-aqua))',
+  			'electric-pink': 'hsl(var(--electric-pink))'
   		},
   		backgroundImage: {
   			'gradient-purple-blue': 'var(--gradient-purple-blue)',
