@@ -25,20 +25,18 @@ serve(async (req) => {
       }
     );
 
-    // Create regular client to verify caller
-    const authHeader = req.headers.get('Authorization')!;
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: authHeader },
-        },
-      }
-    );
+    // Get and verify JWT token from Authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    // Verify the caller is authenticated
-    const { data: { user: caller }, error: authError } = await supabaseClient.auth.getUser();
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user: caller }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    
     if (authError || !caller) {
       console.error('Authentication error:', authError);
       return new Response(
