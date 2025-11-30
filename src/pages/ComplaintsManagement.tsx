@@ -20,16 +20,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Trash2, Search, ChevronLeft, ChevronRight, Download, MessageSquare } from "lucide-react";
+import { Eye, Trash2, Search, ChevronLeft, ChevronRight, Download, MessageSquare, Clock } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { ComplaintDetailsModal } from "@/components/ComplaintDetailsModal";
+import { DeadlineTimer } from "@/components/DeadlineTimer";
 import { format } from "date-fns";
 
 export default function ComplaintsManagement() {
   const { toast } = useToast();
+  const { assignedCategories, isCategoryAdmin, isSuperAdmin } = useAuth();
   const [complaints, setComplaints] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [messageCounts, setMessageCounts] = useState<Record<string, number>>({});
@@ -55,14 +58,20 @@ export default function ComplaintsManagement() {
   }, [complaints, searchQuery, selectedCategory, selectedPriority, selectedStatus]);
 
   const fetchComplaints = async () => {
-    const { data, error } = await supabase
+    let query = supabase
       .from("complaints")
       .select(`
         *,
         profiles:user_id (name, email),
         categories:category_id (name)
-      `)
-      .order("created_at", { ascending: false });
+      `);
+
+    // Filter by assigned categories for category admins
+    if (isCategoryAdmin && assignedCategories.length > 0) {
+      query = query.in("category_id", assignedCategories);
+    }
+
+    const { data, error } = await query.order("created_at", { ascending: false });
 
     if (error) {
       toast({
@@ -384,6 +393,7 @@ export default function ComplaintsManagement() {
                   <TableHead className="font-semibold">Category</TableHead>
                   <TableHead className="font-semibold">Priority</TableHead>
                   <TableHead className="font-semibold">Status</TableHead>
+                  <TableHead className="font-semibold">Deadline</TableHead>
                   <TableHead className="font-semibold">Date</TableHead>
                   <TableHead className="text-right font-semibold">Actions</TableHead>
                 </TableRow>
@@ -431,6 +441,13 @@ export default function ComplaintsManagement() {
                           <SelectItem value="closed">Closed</SelectItem>
                         </SelectContent>
                       </Select>
+                    </TableCell>
+                    <TableCell>
+                      {complaint.deadline ? (
+                        <DeadlineTimer deadline={complaint.deadline} />
+                      ) : (
+                        <span className="text-xs text-muted-foreground">No deadline</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {format(new Date(complaint.created_at), "MMM d, yyyy")}

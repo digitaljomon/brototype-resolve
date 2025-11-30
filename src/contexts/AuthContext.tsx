@@ -6,7 +6,10 @@ import { useNavigate } from "react-router-dom";
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  userRole: "student" | "admin" | null;
+  userRole: "student" | "admin" | "super_admin" | "category_admin" | null;
+  isSuperAdmin: boolean;
+  isCategoryAdmin: boolean;
+  assignedCategories: string[];
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (name: string, email: string, password: string) => Promise<{ error: any }>;
@@ -26,9 +29,13 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [userRole, setUserRole] = useState<"student" | "admin" | null>(null);
+  const [userRole, setUserRole] = useState<"student" | "admin" | "super_admin" | "category_admin" | null>(null);
+  const [assignedCategories, setAssignedCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const isSuperAdmin = userRole === "super_admin" || userRole === "admin";
+  const isCategoryAdmin = userRole === "category_admin";
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -69,7 +76,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .single();
 
     if (!error && data) {
-      setUserRole(data.role as "student" | "admin");
+      setUserRole(data.role as "student" | "admin" | "super_admin" | "category_admin");
+      
+      // Fetch assigned categories if category admin
+      if (data.role === "category_admin") {
+        const { data: categoriesData } = await supabase
+          .from("admin_category_assignments")
+          .select("category_id")
+          .eq("admin_id", userId);
+        
+        if (categoriesData) {
+          setAssignedCategories(categoriesData.map(c => c.category_id));
+        }
+      }
     }
     setLoading(false);
   };
@@ -109,6 +128,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user,
         session,
         userRole,
+        isSuperAdmin,
+        isCategoryAdmin,
+        assignedCategories,
         loading,
         signIn,
         signUp,

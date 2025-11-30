@@ -5,7 +5,8 @@ import {
   BarChart3, 
   Users, 
   Settings, 
-  LogOut 
+  LogOut,
+  Shield
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -23,22 +24,19 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const mainItems = [
-  { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-  { title: "Complaints", url: "/admin/complaints", icon: FileText },
-  { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
-  { title: "Manage Categories", url: "/admin/categories", icon: Tags },
-  { title: "User Management", url: "/admin/users", icon: Users },
-];
-
-const settingsItems = [
-  { title: "Settings", url: "/admin/settings", icon: Settings },
-];
-
 export function AppSidebar() {
   const { open } = useSidebar();
   const location = useLocation();
-  const { signOut } = useAuth();
+  const { signOut, isSuperAdmin } = useAuth();
+  
+  const mainItems = [
+    { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
+    { title: "Complaints", url: "/admin/complaints", icon: FileText },
+    { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
+    { title: "Manage Categories", url: "/admin/categories", icon: Tags },
+    { title: "User Management", url: "/admin/users", icon: Users },
+    ...(isSuperAdmin ? [{ title: "Admin Management", url: "/admin/admins", icon: Shield }] : []),
+  ];
   
   const isActive = (path: string) => {
     if (path === "/admin") {
@@ -95,20 +93,18 @@ export function AppSidebar() {
       {/* Footer with Settings and Logout */}
       <SidebarFooter className="bg-sidebar border-t border-sidebar-border">
         <SidebarMenu>
-          {settingsItems.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild>
-                <NavLink
-                  to={item.url}
-                  className="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 hover:bg-sidebar-accent/10"
-                  activeClassName="bg-gradient-to-r from-sidebar-accent/20 to-sidebar-accent/10 text-sidebar-accent font-semibold"
-                >
-                  <item.icon className="h-5 w-5" />
-                  {open && <span>{item.title}</span>}
-                </NavLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <NavLink
+                to="/admin/settings"
+                className="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 hover:bg-sidebar-accent/10"
+                activeClassName="bg-gradient-to-r from-sidebar-accent/20 to-sidebar-accent/10 text-sidebar-accent font-semibold"
+              >
+                <Settings className="h-5 w-5" />
+                {open && <span>Settings</span>}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <button

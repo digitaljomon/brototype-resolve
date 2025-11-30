@@ -14,6 +14,76 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_category_assignments: {
+        Row: {
+          admin_id: string
+          assigned_by: string
+          category_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          admin_id: string
+          assigned_by: string
+          category_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          admin_id?: string
+          assigned_by?: string
+          category_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_category_assignments_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_messages: {
+        Row: {
+          complaint_id: string | null
+          created_at: string
+          id: string
+          is_read: boolean | null
+          message: string
+          recipient_id: string | null
+          sender_id: string
+        }
+        Insert: {
+          complaint_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message: string
+          recipient_id?: string | null
+          sender_id: string
+        }
+        Update: {
+          complaint_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          recipient_id?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_messages_complaint_id_fkey"
+            columns: ["complaint_id"]
+            isOneToOne: false
+            referencedRelation: "complaints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
@@ -166,9 +236,12 @@ export type Database = {
       }
       complaints: {
         Row: {
+          assigned_to: string | null
           attachments: Json | null
           category_id: string | null
           created_at: string
+          deadline: string | null
+          deadline_note: string | null
           description: string
           id: string
           priority: string
@@ -178,9 +251,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assigned_to?: string | null
           attachments?: Json | null
           category_id?: string | null
           created_at?: string
+          deadline?: string | null
+          deadline_note?: string | null
           description: string
           id?: string
           priority: string
@@ -190,9 +266,12 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assigned_to?: string | null
           attachments?: Json | null
           category_id?: string | null
           created_at?: string
+          deadline?: string | null
+          deadline_note?: string | null
           description?: string
           id?: string
           priority?: string
@@ -273,6 +352,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_view_complaint: {
+        Args: { _complaint_id: string; _user_id: string }
+        Returns: boolean
+      }
+      get_admin_categories: {
+        Args: { _user_id: string }
+        Returns: {
+          category_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -280,9 +369,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_category_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "student" | "admin"
+      app_role: "student" | "admin" | "super_admin" | "category_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -410,7 +501,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["student", "admin"],
+      app_role: ["student", "admin", "super_admin", "category_admin"],
     },
   },
 } as const

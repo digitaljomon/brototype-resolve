@@ -14,8 +14,11 @@ import { ComplaintChat } from "@/components/ComplaintChat";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { User, Calendar, MessageSquare, Trash2, History, Image as ImageIcon } from "lucide-react";
+import { User, Calendar, MessageSquare, Trash2, History, Image as ImageIcon, UserPlus, Clock } from "lucide-react";
 import { format } from "date-fns";
+import { AssignComplaintModal } from "@/components/AssignComplaintModal";
+import { SetDeadlineModal } from "@/components/SetDeadlineModal";
+import { DeadlineTimer } from "@/components/DeadlineTimer";
 
 interface ComplaintDetailsModalProps {
   complaint: any;
@@ -26,7 +29,7 @@ interface ComplaintDetailsModalProps {
 
 export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate }: ComplaintDetailsModalProps) {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, isSuperAdmin } = useAuth();
   const [notes, setNotes] = useState<any[]>([]);
   const [newNote, setNewNote] = useState("");
   const [status, setStatus] = useState(complaint.status);
@@ -34,14 +37,34 @@ export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [messageCount, setMessageCount] = useState(0);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [isDeadlineModalOpen, setIsDeadlineModalOpen] = useState(false);
+  const [assignedAdmin, setAssignedAdmin] = useState<any>(null);
 
   useEffect(() => {
     if (open && complaint) {
       fetchNotes();
       fetchMessageCount();
+      fetchAssignedAdmin();
       setStatus(complaint.status);
     }
   }, [open, complaint]);
+
+  const fetchAssignedAdmin = async () => {
+    if (complaint.assigned_to) {
+      const { data } = await supabase
+        .from("profiles")
+        .select("name, email")
+        .eq("id", complaint.assigned_to)
+        .single();
+      
+      if (data) {
+        setAssignedAdmin(data);
+      }
+    } else {
+      setAssignedAdmin(null);
+    }
+  };
 
   const fetchMessageCount = async () => {
     const { count } = await supabase
@@ -157,30 +180,72 @@ export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate 
           <div className="flex items-start justify-between">
             <div className="space-y-2">
               <h3 className="text-xl font-bold text-foreground">{complaint.title}</h3>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 flex-wrap">
                 <PriorityBadge priority={complaint.priority} />
                 <StatusBadge status={status} />
+                {complaint.deadline && (
+                  <DeadlineTimer deadline={complaint.deadline} />
+                )}
               </div>
             </div>
-            <div className="text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                {format(new Date(complaint.created_at), "PPP")}
+            <div className="flex flex-col gap-2 items-end">
+              <div className="text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  {format(new Date(complaint.created_at), "PPP")}
+                </div>
               </div>
+              {isSuperAdmin && (
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsAssignModalOpen(true)}
+                    className="gap-2"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    {complaint.assigned_to ? "Reassign" : "Assign"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsDeadlineModalOpen(true)}
+                    className="gap-2"
+                  >
+                    <Clock className="h-4 w-4" />
+                    {complaint.deadline ? "Update" : "Set"} Deadline
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Student Info */}
-          <div className="glass-card p-4 rounded-lg border-2">
-            <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Student Information
-            </h4>
-            <div className="space-y-1 text-sm">
-              <p className="text-foreground"><span className="font-medium">Name:</span> {complaint.profiles?.name}</p>
-              <p className="text-foreground"><span className="font-medium">Email:</span> {complaint.profiles?.email}</p>
-              <p className="text-foreground"><span className="font-medium">Category:</span> {complaint.categories?.name || "N/A"}</p>
+          {/* Student Info & Assignment */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="glass-card p-4 rounded-lg border-2">
+              <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Student Information
+              </h4>
+              <div className="space-y-1 text-sm">
+                <p className="text-foreground"><span className="font-medium">Name:</span> {complaint.profiles?.name}</p>
+                <p className="text-foreground"><span className="font-medium">Email:</span> {complaint.profiles?.email}</p>
+                <p className="text-foreground"><span className="font-medium">Category:</span> {complaint.categories?.name || "N/A"}</p>
+              </div>
             </div>
+
+            {assignedAdmin && (
+              <div className="glass-card p-4 rounded-lg border-2 bg-primary/5">
+                <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Assigned To
+                </h4>
+                <div className="space-y-1 text-sm">
+                  <p className="text-foreground"><span className="font-medium">Admin:</span> {assignedAdmin.name}</p>
+                  <p className="text-foreground"><span className="font-medium">Email:</span> {assignedAdmin.email}</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Description */}
@@ -330,6 +395,25 @@ export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate 
             onOpenChange={setIsImageModalOpen}
           />
         )}
+
+        {/* Assignment Modal */}
+        <AssignComplaintModal
+          complaint={complaint}
+          open={isAssignModalOpen}
+          onOpenChange={setIsAssignModalOpen}
+          onAssigned={() => {
+            onUpdate();
+            fetchAssignedAdmin();
+          }}
+        />
+
+        {/* Deadline Modal */}
+        <SetDeadlineModal
+          complaint={complaint}
+          open={isDeadlineModalOpen}
+          onOpenChange={setIsDeadlineModalOpen}
+          onDeadlineSet={onUpdate}
+        />
       </DialogContent>
     </Dialog>
   );
