@@ -80,6 +80,48 @@ export type Database = {
           },
         ]
       }
+      complaint_messages: {
+        Row: {
+          complaint_id: string
+          created_at: string
+          id: string
+          is_admin: boolean
+          message: string
+          sender_id: string
+        }
+        Insert: {
+          complaint_id: string
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          message: string
+          sender_id: string
+        }
+        Update: {
+          complaint_id?: string
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          message?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complaint_messages_complaint_id_fkey"
+            columns: ["complaint_id"]
+            isOneToOne: false
+            referencedRelation: "complaints"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "complaint_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       complaint_notes: {
         Row: {
           admin_id: string
