@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { ComplaintTimeline } from "@/components/ComplaintTimeline";
@@ -32,13 +33,24 @@ export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate 
   const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [messageCount, setMessageCount] = useState(0);
 
   useEffect(() => {
     if (open && complaint) {
       fetchNotes();
+      fetchMessageCount();
       setStatus(complaint.status);
     }
   }, [open, complaint]);
+
+  const fetchMessageCount = async () => {
+    const { count } = await supabase
+      .from("complaint_messages")
+      .select("*", { count: "exact", head: true })
+      .eq("complaint_id", complaint.id);
+    
+    setMessageCount(count || 0);
+  };
 
   const fetchNotes = async () => {
     const { data, error } = await supabase
@@ -239,6 +251,11 @@ export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate 
               <TabsTrigger value="messages" className="flex items-center gap-2">
                 <MessageSquare className="h-4 w-4" />
                 Messages
+                {messageCount > 0 && (
+                  <Badge className="ml-1 bg-electric-pink text-white border-0 h-5 min-w-5 px-1.5">
+                    {messageCount}
+                  </Badge>
+                )}
               </TabsTrigger>
             </TabsList>
 
