@@ -13,7 +13,7 @@ export const RoleBasedRedirect = () => {
   }
 
   // Redirect based on user role
-  if (userRole === "admin") {
+  if (userRole === "admin" || userRole === "super_admin" || userRole === "category_admin") {
     return <Navigate to="/admin" replace />;
   }
 
