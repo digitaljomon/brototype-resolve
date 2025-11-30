@@ -9,6 +9,12 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { RoleBasedRedirect } from "@/components/RoleBasedRedirect";
 import Auth from "./pages/Auth";
 import StudentDashboard from "./pages/StudentDashboard";
+import StudentComplaints from "./pages/StudentComplaints";
+import FileComplaint from "./pages/FileComplaint";
+import StudentNotifications from "./pages/StudentNotifications";
+import StudentProfile from "./pages/StudentProfile";
+import StudentHelp from "./pages/StudentHelp";
+import { StudentLayout } from "@/components/StudentLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import ComplaintsManagement from "./pages/ComplaintsManagement";
 import AdminAnalytics from "./pages/AdminAnalytics";
@@ -37,11 +43,65 @@ const App = () => (
                 } 
               />
               <Route path="/auth" element={<Auth />} />
+              
+              {/* Student Routes with Layout */}
               <Route
                 path="/dashboard"
                 element={
                   <ProtectedRoute requireStudent>
-                    <StudentDashboard />
+                    <StudentLayout>
+                      <StudentDashboard />
+                    </StudentLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/complaints"
+                element={
+                  <ProtectedRoute requireStudent>
+                    <StudentLayout>
+                      <StudentComplaints />
+                    </StudentLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/file-complaint"
+                element={
+                  <ProtectedRoute requireStudent>
+                    <StudentLayout>
+                      <FileComplaint />
+                    </StudentLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/notifications"
+                element={
+                  <ProtectedRoute requireStudent>
+                    <StudentLayout>
+                      <StudentNotifications />
+                    </StudentLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/profile"
+                element={
+                  <ProtectedRoute requireStudent>
+                    <StudentLayout>
+                      <StudentProfile />
+                    </StudentLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/help"
+                element={
+                  <ProtectedRoute requireStudent>
+                    <StudentLayout>
+                      <StudentHelp />
+                    </StudentLayout>
                   </ProtectedRoute>
                 }
               />
