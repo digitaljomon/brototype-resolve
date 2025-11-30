@@ -10,6 +10,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -34,6 +35,8 @@ export default function AdminDashboard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [deleteComplaintId, setDeleteComplaintId] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -176,6 +179,38 @@ export default function AdminDashboard() {
       });
       fetchCategories();
     }
+  };
+
+  const handleDeleteComplaint = async () => {
+    if (!deleteComplaintId) return;
+
+    const { error } = await supabase
+      .from("complaints")
+      .delete()
+      .eq("id", deleteComplaintId);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Deleted",
+        description: "Complaint deleted successfully",
+      });
+      fetchComplaints();
+    }
+
+    setIsDeleteDialogOpen(false);
+    setDeleteComplaintId(null);
+  };
+
+  const openDeleteDialog = (e: React.MouseEvent, complaintId: string) => {
+    e.stopPropagation();
+    setDeleteComplaintId(complaintId);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -329,8 +364,18 @@ export default function AdminDashboard() {
                         <TableCell>
                           {new Date(complaint.created_at).toLocaleDateString()}
                         </TableCell>
-                        <TableCell>
-                          <StatusBadge status={complaint.status} />
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center gap-2">
+                            <StatusBadge status={complaint.status} />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => openDeleteDialog(e, complaint.id)}
+                              className="h-8 w-8 hover:bg-destructive/20 hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -350,6 +395,28 @@ export default function AdminDashboard() {
             onUpdate={fetchComplaints}
           />
         )}
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the complaint
+                and all associated notes and history.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteComplaint}
+                className="bg-destructive hover:bg-destructive/90"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </div>
   );

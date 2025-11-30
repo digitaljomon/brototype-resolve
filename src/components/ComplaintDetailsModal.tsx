@@ -8,10 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { ComplaintTimeline } from "@/components/ComplaintTimeline";
+import { ImageViewerModal } from "@/components/ImageViewerModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { User, Calendar, MessageSquare, Trash2, History } from "lucide-react";
+import { User, Calendar, MessageSquare, Trash2, History, Image as ImageIcon } from "lucide-react";
 import { format } from "date-fns";
 
 interface ComplaintDetailsModalProps {
@@ -28,6 +29,8 @@ export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate 
   const [newNote, setNewNote] = useState("");
   const [status, setStatus] = useState(complaint.status);
   const [loading, setLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
   useEffect(() => {
     if (open && complaint) {
@@ -120,6 +123,11 @@ export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate 
     }
   };
 
+  const openImageViewer = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+    setIsImageModalOpen(true);
+  };
+
   if (!complaint) return null;
 
   return (
@@ -173,15 +181,26 @@ export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate 
           {/* Attachments */}
           {complaint.attachments && complaint.attachments.length > 0 && (
             <div className="space-y-2">
-              <h4 className="font-semibold text-foreground">Attachments</h4>
+              <h4 className="font-semibold text-foreground flex items-center gap-2">
+                <ImageIcon className="h-4 w-4" />
+                Attachments
+              </h4>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {complaint.attachments.map((attachment: string, index: number) => (
-                  <img
+                  <div
                     key={index}
-                    src={attachment}
-                    alt={`Attachment ${index + 1}`}
-                    className="rounded-lg border-2 w-full h-32 object-cover"
-                  />
+                    className="relative group cursor-pointer"
+                    onClick={() => openImageViewer(attachment)}
+                  >
+                    <img
+                      src={attachment}
+                      alt={`Attachment ${index + 1}`}
+                      className="rounded-lg border-2 w-full h-32 object-cover hover:opacity-80 transition-opacity"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center">
+                      <ImageIcon className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -273,6 +292,15 @@ export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate 
             </TabsContent>
           </Tabs>
         </div>
+
+        {/* Image Viewer Modal */}
+        {selectedImage && (
+          <ImageViewerModal
+            imageUrl={selectedImage}
+            open={isImageModalOpen}
+            onOpenChange={setIsImageModalOpen}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
