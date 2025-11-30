@@ -81,7 +81,7 @@ export default function AdminDashboard() {
       pending: data.filter((c) => c.status === "pending").length,
       ongoing: data.filter((c) => c.status === "ongoing").length,
       completed: data.filter((c) => c.status === "completed").length,
-      high: data.filter((c) => c.priority === "high").length,
+      high: data.filter((c) => c.priority === "high" && !["resolved", "completed", "closed", "rejected"].includes(c.status)).length,
       verified: data.filter((c) => c.status === "verified").length,
       assigned: data.filter((c) => c.status === "assigned").length,
       in_progress: data.filter((c) => c.status === "in_progress").length,
