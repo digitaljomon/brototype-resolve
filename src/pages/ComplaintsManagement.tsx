@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Trash2, Search, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { Eye, Trash2, Search, ChevronLeft, ChevronRight, Download, MessageSquare } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useToast } from "@/hooks/use-toast";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -32,6 +32,7 @@ export default function ComplaintsManagement() {
   const { toast } = useToast();
   const [complaints, setComplaints] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
+  const [messageCounts, setMessageCounts] = useState<Record<string, number>>({});
   const [filteredComplaints, setFilteredComplaints] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -45,6 +46,7 @@ export default function ComplaintsManagement() {
   useEffect(() => {
     fetchComplaints();
     fetchCategories();
+    fetchMessageCounts();
     setupRealtimeSubscription();
   }, []);
 
@@ -82,7 +84,7 @@ export default function ComplaintsManagement() {
   };
 
   const setupRealtimeSubscription = () => {
-    const channel = supabase
+    const complaintsChannel = supabase
       .channel("complaints-changes")
       .on(
         "postgres_changes",
@@ -93,9 +95,35 @@ export default function ComplaintsManagement() {
       )
       .subscribe();
 
+    const messagesChannel = supabase
+      .channel("messages-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "complaint_messages" },
+        () => {
+          fetchMessageCounts();
+        }
+      )
+      .subscribe();
+
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(complaintsChannel);
+      supabase.removeChannel(messagesChannel);
     };
+  };
+
+  const fetchMessageCounts = async () => {
+    const { data } = await supabase
+      .from("complaint_messages")
+      .select("complaint_id");
+
+    if (data) {
+      const counts: Record<string, number> = {};
+      data.forEach((msg) => {
+        counts[msg.complaint_id] = (counts[msg.complaint_id] || 0) + 1;
+      });
+      setMessageCounts(counts);
+    }
   };
 
   const filterComplaints = () => {
@@ -412,10 +440,15 @@ export default function ComplaintsManagement() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
+                          className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors relative"
                           onClick={() => handleViewDetails(complaint)}
                         >
                           <Eye className="h-4 w-4" />
+                          {messageCounts[complaint.id] > 0 && (
+                            <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs bg-electric-pink border-0">
+                              {messageCounts[complaint.id]}
+                            </Badge>
+                          )}
                         </Button>
                         <Button
                           variant="ghost"
