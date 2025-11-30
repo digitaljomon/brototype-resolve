@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
+import { ComplaintTimeline } from "@/components/ComplaintTimeline";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { User, Calendar, MessageSquare, Trash2 } from "lucide-react";
+import { User, Calendar, MessageSquare, Trash2, History } from "lucide-react";
 import { format } from "date-fns";
 
 interface ComplaintDetailsModalProps {
@@ -200,64 +202,76 @@ export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate 
             </Select>
           </div>
 
-          {/* Internal Notes */}
-          <div className="space-y-4">
-            <h4 className="font-semibold text-foreground flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              Internal Admin Notes
-            </h4>
+          {/* Tabs for Notes and Timeline */}
+          <Tabs defaultValue="notes" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="notes" className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                Internal Notes
+              </TabsTrigger>
+              <TabsTrigger value="timeline" className="flex items-center gap-2">
+                <History className="h-4 w-4" />
+                Timeline
+              </TabsTrigger>
+            </TabsList>
 
-            {/* Notes List */}
-            <div className="space-y-3 max-h-60 overflow-y-auto">
-              {notes.map((note) => (
-                <div key={note.id} className="glass-card p-4 rounded-lg border">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="font-medium text-sm text-foreground">{note.profiles?.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(note.created_at), "PPp")}
-                      </p>
+            <TabsContent value="notes" className="space-y-4 mt-4">
+              {/* Notes List */}
+              <div className="space-y-3 max-h-60 overflow-y-auto">
+                {notes.map((note) => (
+                  <div key={note.id} className="glass-card p-4 rounded-lg border">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="font-medium text-sm text-foreground">{note.profiles?.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(new Date(note.created_at), "PPp")}
+                        </p>
+                      </div>
+                      {note.admin_id === user?.id && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteNote(note.id)}
+                          className="h-8 w-8 hover:bg-destructive/20"
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      )}
                     </div>
-                    {note.admin_id === user?.id && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteNote(note.id)}
-                        className="h-8 w-8 hover:bg-destructive/20"
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    )}
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">{note.note}</p>
                   </div>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{note.note}</p>
-                </div>
-              ))}
-              {notes.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No internal notes yet
-                </p>
-              )}
-            </div>
+                ))}
+                {notes.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No internal notes yet
+                  </p>
+                )}
+              </div>
 
-            {/* Add Note */}
-            <div className="space-y-2">
-              <Label htmlFor="newNote">Add Internal Note</Label>
-              <Textarea
-                id="newNote"
-                placeholder="Add a note visible only to admins..."
-                value={newNote}
-                onChange={(e) => setNewNote(e.target.value)}
-                className="glass-card min-h-[100px]"
-              />
-              <Button
-                onClick={addNote}
-                disabled={loading || !newNote.trim()}
-                className="w-full bg-gradient-pink-purple text-white"
-              >
-                Add Note
-              </Button>
-            </div>
-          </div>
+              {/* Add Note */}
+              <div className="space-y-2">
+                <Label htmlFor="newNote">Add Internal Note</Label>
+                <Textarea
+                  id="newNote"
+                  placeholder="Add a note visible only to admins..."
+                  value={newNote}
+                  onChange={(e) => setNewNote(e.target.value)}
+                  className="glass-card min-h-[100px]"
+                />
+                <Button
+                  onClick={addNote}
+                  disabled={loading || !newNote.trim()}
+                  className="w-full bg-gradient-pink-purple text-white"
+                >
+                  Add Note
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="timeline" className="mt-4">
+              <ComplaintTimeline complaintId={complaint.id} />
+            </TabsContent>
+          </Tabs>
         </div>
       </DialogContent>
     </Dialog>
