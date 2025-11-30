@@ -11,6 +11,7 @@ import {
 
 export default function AdminAnalytics() {
   const [loading, setLoading] = useState(true);
+  const [dateRange, setDateRange] = useState<7 | 30 | 90>(7);
   const [analyticsData, setAnalyticsData] = useState({
     statusDistribution: [],
     categoryDistribution: [],
@@ -31,7 +32,7 @@ export default function AdminAnalytics() {
 
   useEffect(() => {
     fetchAnalyticsData();
-  }, []);
+  }, [dateRange]);
 
   const fetchAnalyticsData = async () => {
     try {
@@ -82,14 +83,14 @@ export default function AdminAnalytics() {
           fill: COLORS[name as keyof typeof COLORS] || "hsl(var(--chart-1))",
         }));
 
-        // Complaints over time (last 7 days)
-        const last7Days = Array.from({ length: 7 }, (_, i) => {
+        // Complaints over time (based on selected date range)
+        const days = Array.from({ length: dateRange }, (_, i) => {
           const date = new Date();
-          date.setDate(date.getDate() - (6 - i));
+          date.setDate(date.getDate() - (dateRange - 1 - i));
           return date.toISOString().split('T')[0];
         });
 
-        const timeData = last7Days.map(date => {
+        const timeData = days.map(date => {
           const count = complaints.filter(c => 
             c.created_at.startsWith(date)
           ).length;
@@ -182,13 +183,49 @@ export default function AdminAnalytics() {
     <AdminLayout>
       <div className="space-y-4">
         {/* Page Header */}
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-neon-blue to-neon-aqua flex items-center justify-center shadow-lg">
-            <BarChart3 className="h-5 w-5 text-white" />
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-neon-blue to-neon-aqua flex items-center justify-center shadow-lg">
+              <BarChart3 className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">Analytics</h2>
+              <p className="text-sm text-muted-foreground">Insights and statistics for complaints</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold">Analytics</h2>
-            <p className="text-sm text-muted-foreground">Insights and statistics for complaints</p>
+          
+          {/* Date Range Filter */}
+          <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-1">
+            <button
+              onClick={() => setDateRange(7)}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                dateRange === 7
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              7 Days
+            </button>
+            <button
+              onClick={() => setDateRange(30)}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                dateRange === 30
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              30 Days
+            </button>
+            <button
+              onClick={() => setDateRange(90)}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                dateRange === 90
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              90 Days
+            </button>
           </div>
         </div>
 
@@ -334,7 +371,7 @@ export default function AdminAnalytics() {
           {/* Complaints Over Time */}
           <Card className="shadow-lg">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Complaints Trend (Last 7 Days)</CardTitle>
+              <CardTitle className="text-lg">Complaints Trend (Last {dateRange} Days)</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <ResponsiveContainer width="100%" height={220}>
