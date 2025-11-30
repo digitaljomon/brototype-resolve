@@ -111,7 +111,9 @@ export function ComplaintChat({ complaintId }: ComplaintChatProps) {
         .eq("user_id", user.id)
         .single();
 
-      const isAdmin = roleData?.role === "admin";
+      const isAdmin = roleData?.role === "admin" || 
+                      roleData?.role === "super_admin" || 
+                      roleData?.role === "category_admin";
 
       const { error } = await supabase
         .from("complaint_messages")
