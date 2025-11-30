@@ -56,8 +56,10 @@ export function SimpleStudentLayout({ children }: SimpleStudentLayoutProps) {
                 onClick={() => setSidebarOpen(false)}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-lg transition-all hover:bg-accent",
-                    isActive && "bg-gradient-purple-blue text-white font-medium"
+                    "flex items-center gap-3 px-4 py-3 rounded-lg transition-all",
+                    isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-sm" 
+                      : "hover:bg-accent text-muted-foreground hover:text-foreground"
                   )
                 }
               >

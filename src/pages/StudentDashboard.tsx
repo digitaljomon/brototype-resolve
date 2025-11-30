@@ -50,121 +50,120 @@ export default function StudentDashboard() {
 
   const kpiCards = [
     {
-      title: "Total Complaints",
-      value: stats.total,
-      icon: FileText,
-      color: "text-blue-500",
-      bgColor: "bg-blue-500/10",
-    },
-    {
       title: "Pending",
       value: stats.pending,
       icon: Clock,
-      color: "text-yellow-500",
-      bgColor: "bg-yellow-500/10",
+      gradient: "from-orange-400 to-orange-500",
+      iconBg: "bg-white/20",
     },
     {
       title: "In Progress",
       value: stats.in_progress,
       icon: AlertCircle,
-      color: "text-orange-500",
-      bgColor: "bg-orange-500/10",
+      gradient: "from-cyan-400 to-cyan-500",
+      iconBg: "bg-white/20",
     },
     {
       title: "Resolved",
       value: stats.resolved,
       icon: CheckCircle,
-      color: "text-green-500",
-      bgColor: "bg-green-500/10",
+      gradient: "from-green-400 to-green-500",
+      iconBg: "bg-white/20",
+    },
+    {
+      title: "Total",
+      value: stats.total,
+      icon: FileText,
+      gradient: "from-purple-400 to-pink-500",
+      iconBg: "bg-white/20",
     },
   ];
 
   return (
     <div className="container mx-auto px-6 py-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Welcome Back!</h2>
-          <p className="text-muted-foreground">Here's an overview of your complaints</p>
+      {/* Header Section */}
+      <div className="mb-8 flex items-start gap-4">
+        <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10">
+          <FileText className="h-8 w-8 text-primary" />
         </div>
+        <div>
+          <h2 className="text-3xl font-bold mb-1">Dashboard Overview</h2>
+          <p className="text-muted-foreground">Monitor and manage your complaints</p>
+        </div>
+      </div>
 
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        ) : (
-          <>
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {kpiCards.map((card) => (
-                <Card key={card.title} className="glass-card hover:shadow-lg transition-all">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
-                      {card.title}
-                    </CardTitle>
-                    <div className={`p-2 rounded-lg ${card.bgColor}`}>
-                      <card.icon className={`h-5 w-5 ${card.color}`} />
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : (
+        <>
+          {/* KPI Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {kpiCards.map((card) => (
+              <Card 
+                key={card.title} 
+                className={`border-0 bg-gradient-to-br ${card.gradient} text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="text-sm font-medium opacity-90">{card.title}</div>
+                    <div className={`p-2 rounded-full ${card.iconBg}`}>
+                      <card.icon className="h-5 w-5" />
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold">{card.value}</div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </div>
+                  <div className="text-5xl font-bold">{card.value}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-            {/* Quick Action Button */}
-            <Card className="mb-8 glass-card bg-gradient-to-br from-primary/10 via-primary/5 to-background">
-              <CardHeader>
-                <CardTitle className="text-2xl">Need Help?</CardTitle>
-                <CardDescription>File a new complaint and we'll assist you</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  onClick={() => navigate("/dashboard/file-complaint")}
-                  className="bg-gradient-purple-blue hover:opacity-90 text-white font-semibold px-8 py-6 text-lg shadow-lg"
-                  size="lg"
-                >
-                  <Plus className="mr-2 h-5 w-5" />
-                  File a New Complaint
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Recent Complaints */}
-            <Card className="glass-card">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Recent Complaints</CardTitle>
-                  <CardDescription>Your latest submissions</CardDescription>
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Recent Complaints - Takes 2 columns */}
+            <Card className="lg:col-span-2 shadow-sm">
+              <CardHeader className="border-b bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xl font-semibold">Latest Complaints</CardTitle>
+                  <Button
+                    variant="ghost"
+                    onClick={() => navigate("/dashboard/complaints")}
+                    className="gap-2 text-primary hover:text-primary"
+                  >
+                    View All
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate("/dashboard/complaints")}
-                  className="gap-2"
-                >
-                  View All
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 {recentComplaints.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">
-                    No complaints yet. Start by filing your first complaint!
-                  </p>
+                  <div className="text-center py-12">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+                      <FileText className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <p className="text-muted-foreground mb-4">No complaints yet</p>
+                    <Button
+                      onClick={() => navigate("/dashboard/file-complaint")}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      File Your First Complaint
+                    </Button>
+                  </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {recentComplaints.map((complaint) => (
                       <div
                         key={complaint.id}
-                        className="flex items-center justify-between p-4 rounded-lg border hover:bg-accent cursor-pointer transition-all"
+                        className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/50 cursor-pointer transition-all duration-200 hover:shadow-md"
                         onClick={() => navigate(`/dashboard/complaint/${complaint.id}`)}
                       >
                         <div className="flex-1">
-                          <h4 className="font-semibold mb-1">{complaint.title}</h4>
-                          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                            <span className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                              {complaint.categories?.name || "Uncategorized"}
+                          <h4 className="font-semibold mb-2">{complaint.title}</h4>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <span className="text-xs">
+                              {format(new Date(complaint.created_at), "MMM d, yyyy")}
                             </span>
-                            <span>{format(new Date(complaint.created_at), "MMM d, yyyy")}</span>
                           </div>
                         </div>
                         <StatusBadge status={complaint.status} />
@@ -174,6 +173,57 @@ export default function StudentDashboard() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Right Sidebar Widgets */}
+            <div className="space-y-6">
+              {/* Quick Action Card */}
+              <Card className="shadow-sm border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+                <CardHeader>
+                  <CardTitle className="text-lg">Need Help?</CardTitle>
+                  <CardDescription>File a new complaint quickly</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    onClick={() => navigate("/dashboard/file-complaint")}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white font-semibold py-6 shadow-lg"
+                  >
+                    <Plus className="mr-2 h-5 w-5" />
+                    File a New Complaint
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Status Summary */}
+              <Card className="shadow-sm">
+                <CardHeader className="border-b bg-muted/30">
+                  <CardTitle className="text-lg">Status Summary</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                      <span className="text-sm font-medium">Pending</span>
+                    </div>
+                    <span className="text-sm font-bold">{stats.pending}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 rounded-full bg-cyan-500"></div>
+                      <span className="text-sm font-medium">In Progress</span>
+                    </div>
+                    <span className="text-sm font-bold">{stats.in_progress}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className="text-sm font-medium">Resolved</span>
+                    </div>
+                    <span className="text-sm font-bold">{stats.resolved}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
           </>
         )}
     </div>
