@@ -363,7 +363,7 @@ export default function AdminAnalytics() {
           </Card>
 
           {/* Category Admin Performance */}
-          <Card className="shadow-lg">
+          <Card className="shadow-lg lg:col-span-2">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg">Category Admin Performance</CardTitle>
             </CardHeader>
