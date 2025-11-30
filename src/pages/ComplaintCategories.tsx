@@ -143,19 +143,19 @@ export default function ComplaintCategories() {
             ) : (
               <div className="flex flex-wrap gap-3">
                 {categories.map((category) => (
-                  <Badge
+                  <div
                     key={category.id}
-                    variant="secondary"
-                    className="px-4 py-2 text-base hover:bg-secondary/80 transition-colors"
+                    className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-neon-purple to-electric-pink text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-2"
                   >
+                    <Tags className="h-4 w-4" />
                     <span>{category.name}</span>
                     <button
                       onClick={() => deleteCategory(category.id)}
-                      className="ml-2 hover:bg-destructive/20 rounded-full p-1 transition-all"
+                      className="ml-1 hover:bg-white/20 rounded-full p-1 transition-all"
                     >
-                      <Trash2 className="h-3 w-3" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </button>
-                  </Badge>
+                  </div>
                 ))}
               </div>
             )}
