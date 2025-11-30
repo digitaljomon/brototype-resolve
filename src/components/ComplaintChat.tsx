@@ -33,7 +33,8 @@ export function ComplaintChat({ complaintId }: ComplaintChatProps) {
 
   useEffect(() => {
     fetchMessages();
-    setupRealtimeSubscription();
+    const cleanup = setupRealtimeSubscription();
+    return cleanup;
   }, [complaintId]);
 
   useEffect(() => {
@@ -47,6 +48,8 @@ export function ComplaintChat({ complaintId }: ComplaintChatProps) {
   };
 
   const setupRealtimeSubscription = () => {
+    console.log("Setting up realtime subscription for complaint:", complaintId);
+    
     const channel = supabase
       .channel(`messages-${complaintId}`)
       .on(
@@ -58,17 +61,22 @@ export function ComplaintChat({ complaintId }: ComplaintChatProps) {
           filter: `complaint_id=eq.${complaintId}`,
         },
         (payload) => {
+          console.log("New message received via realtime:", payload);
           fetchMessages();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Realtime subscription status:", status);
+      });
 
     return () => {
+      console.log("Cleaning up realtime subscription");
       supabase.removeChannel(channel);
     };
   };
 
   const fetchMessages = async () => {
+    console.log("Fetching messages for complaint:", complaintId);
     const { data, error } = await supabase
       .from("complaint_messages")
       .select(`
@@ -82,8 +90,11 @@ export function ComplaintChat({ complaintId }: ComplaintChatProps) {
       .eq("complaint_id", complaintId)
       .order("created_at", { ascending: true });
 
-    if (!error && data) {
-      setMessages(data);
+    if (error) {
+      console.error("Error fetching messages:", error);
+    } else {
+      console.log("Messages fetched:", data?.length || 0);
+      setMessages(data || []);
     }
     setLoading(false);
   };
@@ -114,6 +125,10 @@ export function ComplaintChat({ complaintId }: ComplaintChatProps) {
       if (error) throw error;
 
       setNewMessage("");
+      
+      // Immediately refetch messages for instant feedback
+      await fetchMessages();
+      
       toast({
         title: "Message sent",
         description: "Your message has been sent successfully",
