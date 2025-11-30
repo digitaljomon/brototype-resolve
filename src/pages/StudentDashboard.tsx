@@ -31,6 +31,8 @@ export default function StudentDashboard() {
   const setupRealtimeSubscription = () => {
     if (!user) return () => {};
 
+    console.log("Setting up realtime subscription for user:", user.id);
+
     const channel = supabase
       .channel("student-complaints-updates")
       .on(
@@ -42,7 +44,7 @@ export default function StudentDashboard() {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          console.log("Realtime complaint update:", payload);
+          console.log("✅ Realtime complaint update received:", payload);
           fetchData();
           
           if (payload.eventType === "UPDATE") {
@@ -53,9 +55,15 @@ export default function StudentDashboard() {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Subscription status:", status);
+        if (status === "SUBSCRIBED") {
+          console.log("✅ Successfully subscribed to complaint updates");
+        }
+      });
 
     return () => {
+      console.log("Cleaning up realtime subscription");
       supabase.removeChannel(channel);
     };
   };

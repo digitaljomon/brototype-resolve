@@ -34,6 +34,8 @@ export default function StudentComplaints() {
   const setupRealtimeSubscription = () => {
     if (!user) return () => {};
 
+    console.log("Setting up realtime subscription for complaints list, user:", user.id);
+
     const channel = supabase
       .channel("student-complaints-list")
       .on(
@@ -45,7 +47,7 @@ export default function StudentComplaints() {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          console.log("Realtime update on complaints list:", payload);
+          console.log("✅ Realtime update on complaints list:", payload);
           fetchComplaints();
           
           if (payload.eventType === "UPDATE") {
@@ -56,9 +58,15 @@ export default function StudentComplaints() {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Complaints list subscription status:", status);
+        if (status === "SUBSCRIBED") {
+          console.log("✅ Successfully subscribed to complaints list updates");
+        }
+      });
 
     return () => {
+      console.log("Cleaning up complaints list subscription");
       supabase.removeChannel(channel);
     };
   };
