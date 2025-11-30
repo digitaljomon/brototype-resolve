@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { AdminLayout } from "@/components/AdminLayout";
-import { BarChart3, TrendingUp, Clock, AlertCircle } from "lucide-react";
+import { BarChart3, TrendingUp, Clock, AlertCircle, Download } from "lucide-react";
+import * as XLSX from "xlsx";
 import { 
   BarChart, Bar, PieChart, Pie, LineChart, Line, 
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
@@ -33,6 +35,80 @@ export default function AdminAnalytics() {
   useEffect(() => {
     fetchAnalyticsData();
   }, [dateRange]);
+
+  const exportToExcel = () => {
+    const wb = XLSX.utils.book_new();
+
+    // Summary Sheet
+    const summaryData = [
+      ["Metric", "Value"],
+      ["Total Complaints", analyticsData.statusDistribution.reduce((sum: number, item: any) => sum + item.value, 0)],
+      ["Average Resolution Time (days)", analyticsData.avgResolutionTime],
+      ["High Priority Complaints", analyticsData.priorityDistribution.find((p: any) => p.name === "High")?.value || 0],
+      ["Completion Rate (%)", (() => {
+        const total = analyticsData.statusDistribution.reduce((sum: number, item: any) => sum + item.value, 0);
+        const completed = analyticsData.statusDistribution.find((s: any) => s.name === "Completed")?.value || 0;
+        return total > 0 ? Math.round((completed / total) * 100) : 0;
+      })()],
+      ["Date Range", `Last ${dateRange} days`],
+      ["Export Date", new Date().toLocaleString()],
+    ];
+    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(wb, summarySheet, "Summary");
+
+    // Status Distribution Sheet
+    const statusData = [
+      ["Status", "Count"],
+      ...analyticsData.statusDistribution.map((item: any) => [item.name, item.value])
+    ];
+    const statusSheet = XLSX.utils.aoa_to_sheet(statusData);
+    XLSX.utils.book_append_sheet(wb, statusSheet, "Status Distribution");
+
+    // Category Distribution Sheet
+    const categoryData = [
+      ["Category", "Count"],
+      ...analyticsData.categoryDistribution.map((item: any) => [item.name, item.value])
+    ];
+    const categorySheet = XLSX.utils.aoa_to_sheet(categoryData);
+    XLSX.utils.book_append_sheet(wb, categorySheet, "Category Distribution");
+
+    // Priority Distribution Sheet
+    const priorityData = [
+      ["Priority", "Count"],
+      ...analyticsData.priorityDistribution.map((item: any) => [item.name, item.value])
+    ];
+    const prioritySheet = XLSX.utils.aoa_to_sheet(priorityData);
+    XLSX.utils.book_append_sheet(wb, prioritySheet, "Priority Distribution");
+
+    // Complaints Over Time Sheet
+    const timeData = [
+      ["Date", "Complaints"],
+      ...analyticsData.complaintsOverTime.map((item: any) => [item.date, item.complaints])
+    ];
+    const timeSheet = XLSX.utils.aoa_to_sheet(timeData);
+    XLSX.utils.book_append_sheet(wb, timeSheet, "Complaints Trend");
+
+    // Admin Performance Sheet
+    if (analyticsData.adminCompletionData.length > 0) {
+      const adminData = [
+        ["Admin Name", "Completion Rate (%)", "Total Complaints", "Completed Complaints"],
+        ...analyticsData.adminCompletionData.map((item: any) => [
+          item.name,
+          item.completion,
+          item.total,
+          item.completed
+        ])
+      ];
+      const adminSheet = XLSX.utils.aoa_to_sheet(adminData);
+      XLSX.utils.book_append_sheet(wb, adminSheet, "Admin Performance");
+    }
+
+    // Generate filename with date
+    const filename = `analytics-report-${new Date().toISOString().split('T')[0]}.xlsx`;
+    
+    // Save file
+    XLSX.writeFile(wb, filename);
+  };
 
   const fetchAnalyticsData = async () => {
     try {
@@ -194,38 +270,50 @@ export default function AdminAnalytics() {
             </div>
           </div>
           
-          {/* Date Range Filter */}
-          <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-1">
-            <button
-              onClick={() => setDateRange(7)}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                dateRange === 7
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Export Button */}
+            <Button
+              onClick={exportToExcel}
+              variant="outline"
+              className="gap-2"
             >
-              7 Days
-            </button>
-            <button
-              onClick={() => setDateRange(30)}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                dateRange === 30
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              30 Days
-            </button>
-            <button
-              onClick={() => setDateRange(90)}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                dateRange === 90
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              90 Days
-            </button>
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
+
+            {/* Date Range Filter */}
+            <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-1">
+              <button
+                onClick={() => setDateRange(7)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                  dateRange === 7
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                7 Days
+              </button>
+              <button
+                onClick={() => setDateRange(30)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                  dateRange === 30
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                30 Days
+              </button>
+              <button
+                onClick={() => setDateRange(90)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                  dateRange === 90
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                90 Days
+              </button>
+            </div>
           </div>
         </div>
 
