@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
+import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, 
   FileText, 
@@ -50,6 +51,7 @@ export default function ComplaintDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [complaint, setComplaint] = useState<ComplaintData | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,8 +60,60 @@ export default function ComplaintDetails() {
     if (id) {
       fetchComplaintDetails();
       fetchHistory();
+      setupRealtimeSubscription();
     }
   }, [id]);
+
+  const setupRealtimeSubscription = () => {
+    // Subscribe to complaint updates
+    const complaintChannel = supabase
+      .channel(`complaint-${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "complaints",
+          filter: `id=eq.${id}`,
+        },
+        (payload) => {
+          console.log("Complaint updated:", payload);
+          fetchComplaintDetails();
+          toast({
+            title: "Complaint Updated",
+            description: "This complaint has been updated by an admin",
+          });
+        }
+      )
+      .subscribe();
+
+    // Subscribe to history updates
+    const historyChannel = supabase
+      .channel(`history-${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "complaint_history",
+          filter: `complaint_id=eq.${id}`,
+        },
+        (payload) => {
+          console.log("New history entry:", payload);
+          fetchHistory();
+          toast({
+            title: "New Update",
+            description: "Admin has added a new update to your complaint",
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(complaintChannel);
+      supabase.removeChannel(historyChannel);
+    };
+  };
 
   const fetchComplaintDetails = async () => {
     const { data, error } = await supabase
