@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import StudentDashboard from "./pages/StudentDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import ComplaintCategories from "./pages/ComplaintCategories";
 import UserManagement from "./pages/UserManagement";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -64,6 +65,14 @@ const App = () => (
                 element={
                   <ProtectedRoute requireAdmin>
                     <AdminAnalytics />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/categories"
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <ComplaintCategories />
                   </ProtectedRoute>
                 }
               />
