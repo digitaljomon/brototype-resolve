@@ -4,15 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2, FileText, AlertCircle, Clock, CheckCircle2 } from "lucide-react";
+import { Trash2, FileText, AlertCircle, Clock, CheckCircle2 } from "lucide-react";
 import { AdminLayout } from "@/components/AdminLayout";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ComplaintDetailsModal } from "@/components/ComplaintDetailsModal";
@@ -23,7 +20,6 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [complaints, setComplaints] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -32,22 +28,16 @@ export default function AdminDashboard() {
     high: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [newCategory, setNewCategory] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [deleteComplaintId, setDeleteComplaintId] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
-    fetchData();
-    setupRealtimeSubscription();
+    fetchComplaints();
+    const cleanup = setupRealtimeSubscription();
+    return cleanup;
   }, []);
-
-  const fetchData = async () => {
-    await Promise.all([fetchComplaints(), fetchCategories()]);
-    setLoading(false);
-  };
 
   const fetchComplaints = async () => {
     const { data, error } = await supabase
@@ -75,6 +65,7 @@ export default function AdminDashboard() {
       setComplaints(data);
       calculateStats(data);
     }
+    setLoading(false);
   };
 
   const calculateStats = (data: any[]) => {
@@ -85,17 +76,6 @@ export default function AdminDashboard() {
       completed: data.filter((c) => c.status === "completed").length,
       high: data.filter((c) => c.priority === "high").length,
     });
-  };
-
-  const fetchCategories = async () => {
-    const { data, error } = await supabase
-      .from("categories")
-      .select("*")
-      .order("name");
-
-    if (!error && data) {
-      setCategories(data);
-    }
   };
 
   const setupRealtimeSubscription = () => {
@@ -137,48 +117,6 @@ export default function AdminDashboard() {
         title: "Updated",
         description: "Complaint status updated successfully",
       });
-    }
-  };
-
-  const addCategory = async () => {
-    if (!newCategory.trim()) return;
-
-    const { error } = await supabase
-      .from("categories")
-      .insert({ name: newCategory });
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Success",
-        description: "Category added successfully",
-      });
-      setNewCategory("");
-      setIsDialogOpen(false);
-      fetchCategories();
-    }
-  };
-
-  const deleteCategory = async (id: string) => {
-    const { error } = await supabase.from("categories").delete().eq("id", id);
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Deleted",
-        description: "Category deleted successfully",
-      });
-      fetchCategories();
     }
   };
 
@@ -224,7 +162,7 @@ export default function AdminDashboard() {
           </div>
           <div>
             <h2 className="text-3xl font-bold">Admin Dashboard</h2>
-            <p className="text-muted-foreground">Manage complaints and categories</p>
+            <p className="text-muted-foreground">Overview and quick actions</p>
           </div>
         </div>
 
@@ -280,66 +218,6 @@ export default function AdminDashboard() {
             </div>
           </Card>
         </div>
-
-        {/* Categories Management */}
-        <Card className="shadow-xl">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-2xl">Categories</CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">Manage complaint categories</p>
-              </div>
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-primary to-neon-blue hover:opacity-90 transition-opacity">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Category
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Add New Category</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="categoryName">Category Name</Label>
-                      <Input
-                        id="categoryName"
-                        value={newCategory}
-                        onChange={(e) => setNewCategory(e.target.value)}
-                        placeholder="Enter category name"
-                      />
-                    </div>
-                    <Button
-                      onClick={addCategory}
-                      className="w-full bg-gradient-to-r from-primary to-neon-blue hover:opacity-90"
-                    >
-                      Add Category
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-3">
-              {categories.map((category) => (
-                <Badge
-                  key={category.id}
-                  className="px-4 py-2 text-base bg-gradient-to-r from-primary/10 to-neon-blue/10 text-primary hover:from-primary/20 hover:to-neon-blue/20 border border-primary/20"
-                >
-                  <span>{category.name}</span>
-                  <button
-                    onClick={() => deleteCategory(category.id)}
-                    className="ml-2 hover:bg-destructive/20 rounded-full p-1 transition-all"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Complaints Table */}
         <Card className="shadow-xl">

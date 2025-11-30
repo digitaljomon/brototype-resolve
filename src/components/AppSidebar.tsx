@@ -27,6 +27,7 @@ const mainItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
   { title: "Complaints", url: "/admin/complaints", icon: FileText },
   { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
+  { title: "Manage Categories", url: "/admin/categories", icon: Tags },
   { title: "User Management", url: "/admin/users", icon: Users },
 ];
 
