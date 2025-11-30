@@ -4,11 +4,11 @@ import { AdminLayout } from "@/components/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Shield, UserPlus, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Shield, UserPlus, Trash2, Eye, EyeOff } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -23,20 +23,23 @@ interface Admin {
 export default function AdminManagement() {
   const { toast } = useToast();
   const [admins, setAdmins] = useState<Admin[]>([]);
-  const [students, setStudents] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newAdminName, setNewAdminName] = useState("");
+  const [newAdminEmail, setNewAdminEmail] = useState("");
+  const [newAdminPassword, setNewAdminPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [promotionRole, setPromotionRole] = useState<"category_admin" | "super_admin">("category_admin");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createdCredentials, setCreatedCredentials] = useState<{ email: string; password: string } | null>(null);
 
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    await Promise.all([fetchAdmins(), fetchStudents(), fetchCategories()]);
+    await Promise.all([fetchAdmins(), fetchCategories()]);
     setLoading(false);
   };
 
@@ -85,23 +88,6 @@ export default function AdminManagement() {
     setAdmins(adminsWithCategories as Admin[]);
   };
 
-  const fetchStudents = async () => {
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("user_id, role")
-      .eq("role", "student");
-
-    if (!roles) return;
-
-    const studentIds = roles.map(r => r.user_id);
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("*")
-      .in("id", studentIds);
-
-    setStudents(profiles || []);
-  };
-
   const fetchCategories = async () => {
     const { data } = await supabase
       .from("categories")
@@ -110,88 +96,118 @@ export default function AdminManagement() {
     setCategories(data || []);
   };
 
-  const handlePromoteUser = async () => {
-    if (!selectedUser) return;
+  const generatePassword = () => {
+    const length = 12;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    setNewAdminPassword(password);
+    setShowPassword(true);
+  };
 
-    setLoading(true);
-
-    // Update user role
-    const { error: roleError } = await supabase
-      .from("user_roles")
-      .update({ role: promotionRole })
-      .eq("user_id", selectedUser.id);
-
-    if (roleError) {
+  const handleCreateCategoryAdmin = async () => {
+    if (!newAdminName || !newAdminEmail || !newAdminPassword || selectedCategories.length === 0) {
       toast({
-        title: "Error",
-        description: roleError.message,
+        title: "Validation Error",
+        description: "Please fill all fields and select at least one category",
         variant: "destructive",
       });
-      setLoading(false);
       return;
     }
 
-    // If category admin, assign categories
-    if (promotionRole === "category_admin" && selectedCategories.length > 0) {
-      const currentUser = await supabase.auth.getUser();
-      
-      const assignments = selectedCategories.map(catId => ({
-        admin_id: selectedUser.id,
-        category_id: catId,
-        assigned_by: currentUser.data.user?.id
-      }));
+    setIsSubmitting(true);
 
-      const { error: assignError } = await supabase
-        .from("admin_category_assignments")
-        .insert(assignments);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-category-admin', {
+        body: {
+          name: newAdminName,
+          email: newAdminEmail,
+          password: newAdminPassword,
+          categoryIds: selectedCategories
+        }
+      });
 
-      if (assignError) {
-        toast({
-          title: "Warning",
-          description: "Role updated but category assignment failed",
-          variant: "destructive",
-        });
+      if (error) throw error;
+
+      if (data.error) {
+        throw new Error(data.error);
       }
+
+      // Store credentials to show in success message
+      setCreatedCredentials({
+        email: newAdminEmail,
+        password: newAdminPassword
+      });
+
+      toast({
+        title: "Success",
+        description: `Category admin created successfully`,
+      });
+
+      // Reset form
+      setNewAdminName("");
+      setNewAdminEmail("");
+      setNewAdminPassword("");
+      setSelectedCategories([]);
+      setShowPassword(false);
+
+      // Refresh data
+      fetchData();
+    } catch (error: any) {
+      console.error("Error creating category admin:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create category admin",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
+  };
 
-    toast({
-      title: "Success",
-      description: `User promoted to ${promotionRole === "super_admin" ? "Super Admin" : "Category Admin"}`,
-    });
-
-    setIsPromoteModalOpen(false);
-    setSelectedUser(null);
+  const closeCreateModal = () => {
+    setIsCreateModalOpen(false);
+    setCreatedCredentials(null);
+    setNewAdminName("");
+    setNewAdminEmail("");
+    setNewAdminPassword("");
     setSelectedCategories([]);
-    fetchData();
+    setShowPassword(false);
   };
 
   const handleRevokeAdmin = async (adminId: string) => {
-    if (!confirm("Are you sure you want to revoke admin access?")) return;
+    if (!confirm("Are you sure you want to revoke this admin's access?")) return;
 
-    // Delete category assignments
-    await supabase
-      .from("admin_category_assignments")
-      .delete()
-      .eq("admin_id", adminId);
+    try {
+      // Delete category assignments
+      await supabase
+        .from("admin_category_assignments")
+        .delete()
+        .eq("admin_id", adminId);
 
-    // Update role to student
-    const { error } = await supabase
-      .from("user_roles")
-      .update({ role: "student" })
-      .eq("user_id", adminId);
+      // Update role back to student
+      const { error } = await supabase
+        .from("user_roles")
+        .update({ role: "student" })
+        .eq("user_id", adminId);
 
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
+      if (error) throw error;
+
       toast({
         title: "Success",
-        description: "Admin access revoked",
+        description: "Admin access revoked successfully",
       });
+
       fetchData();
+    } catch (error: any) {
+      console.error("Error revoking admin:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to revoke admin access",
+        variant: "destructive",
+      });
     }
   };
 
@@ -222,6 +238,14 @@ export default function AdminManagement() {
               <p className="text-muted-foreground">Manage administrator roles and permissions</p>
             </div>
           </div>
+          
+          <Button 
+            className="gap-2 bg-gradient-to-r from-primary to-neon-blue hover:opacity-90 transition-opacity"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
+            <UserPlus className="h-4 w-4" />
+            Add Category Admin
+          </Button>
         </div>
 
         {/* Stats */}
@@ -250,11 +274,11 @@ export default function AdminManagement() {
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Students</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Categories</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-blue-500">
-                {students.length}
+                {categories.length}
               </div>
             </CardContent>
           </Card>
@@ -324,115 +348,146 @@ export default function AdminManagement() {
           </CardContent>
         </Card>
 
-        {/* Students Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Promote Students to Admin</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {students.slice(0, 10).map((student) => (
-                  <TableRow key={student.id}>
-                    <TableCell className="font-medium">{student.name}</TableCell>
-                    <TableCell>{student.email}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          setSelectedUser(student);
-                          setIsPromoteModalOpen(true);
-                        }}
-                      >
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        Promote
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
       </div>
 
-      {/* Promote User Modal */}
-      <Dialog open={isPromoteModalOpen} onOpenChange={setIsPromoteModalOpen}>
-        <DialogContent className="max-w-md">
+      {/* Create Category Admin Modal */}
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Promote User to Admin</DialogTitle>
+            <DialogTitle>
+              {createdCredentials ? "Category Admin Created" : "Add New Category Admin"}
+            </DialogTitle>
+            <DialogDescription>
+              {createdCredentials 
+                ? "Share these credentials with the new category admin"
+                : "Create a new category admin account by providing their details and assigning categories"
+              }
+            </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>User</Label>
-              <div className="p-3 bg-muted rounded-lg">
-                <p className="font-medium">{selectedUser?.name}</p>
-                <p className="text-sm text-muted-foreground">{selectedUser?.email}</p>
+          {createdCredentials ? (
+            <div className="space-y-4">
+              <div className="p-4 bg-muted rounded-lg space-y-3">
+                <div>
+                  <Label className="text-sm font-medium">Email</Label>
+                  <div className="mt-1 p-2 bg-background rounded border font-mono text-sm">
+                    {createdCredentials.email}
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Password</Label>
+                  <div className="mt-1 p-2 bg-background rounded border font-mono text-sm">
+                    {createdCredentials.password}
+                  </div>
+                </div>
               </div>
+              <p className="text-sm text-muted-foreground">
+                Make sure to save these credentials. The password cannot be retrieved later.
+              </p>
+              <DialogFooter>
+                <Button onClick={closeCreateModal}>Done</Button>
+              </DialogFooter>
             </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="admin-name">Full Name</Label>
+                  <Input
+                    id="admin-name"
+                    placeholder="Enter full name"
+                    value={newAdminName}
+                    onChange={(e) => setNewAdminName(e.target.value)}
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label>Admin Role</Label>
-              <Select value={promotionRole} onValueChange={(val: any) => setPromotionRole(val)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="super_admin">Super Admin (Full Access)</SelectItem>
-                  <SelectItem value="category_admin">Category Admin (Limited Access)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                <div>
+                  <Label htmlFor="admin-email">Email</Label>
+                  <Input
+                    id="admin-email"
+                    type="email"
+                    placeholder="Enter email address"
+                    value={newAdminEmail}
+                    onChange={(e) => setNewAdminEmail(e.target.value)}
+                  />
+                </div>
 
-            {promotionRole === "category_admin" && (
-              <div className="space-y-2">
+                <div>
+                  <Label htmlFor="admin-password">Password</Label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Input
+                        id="admin-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter password (min 6 characters)"
+                        value={newAdminPassword}
+                        onChange={(e) => setNewAdminPassword(e.target.value)}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={generatePassword}
+                    >
+                      Generate
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
                 <Label>Assign Categories</Label>
-                <div className="space-y-2 max-h-48 overflow-y-auto border rounded-lg p-3">
+                <p className="text-sm text-muted-foreground mb-3">
+                  Select the categories this admin will manage
+                </p>
+                <div className="grid grid-cols-2 gap-3 max-h-[200px] overflow-y-auto p-3 border rounded-lg">
                   {categories.map((category) => (
-                    <div key={category.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={category.id}
+                    <label
+                      key={category.id}
+                      className="flex items-center gap-2 p-2 hover:bg-muted rounded cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
                         checked={selectedCategories.includes(category.id)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
+                        onChange={(e) => {
+                          if (e.target.checked) {
                             setSelectedCategories([...selectedCategories, category.id]);
                           } else {
                             setSelectedCategories(selectedCategories.filter(id => id !== category.id));
                           }
                         }}
+                        className="rounded"
                       />
-                      <label
-                        htmlFor={category.id}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {category.name}
-                      </label>
-                    </div>
+                      <span className="text-sm">{category.name}</span>
+                    </label>
                   ))}
                 </div>
+                {selectedCategories.length === 0 && (
+                  <p className="text-sm text-destructive mt-2">
+                    Please select at least one category
+                  </p>
+                )}
               </div>
-            )}
-          </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsPromoteModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button 
-              onClick={handlePromoteUser}
-              disabled={promotionRole === "category_admin" && selectedCategories.length === 0}
-            >
-              Promote
-            </Button>
-          </DialogFooter>
+              <DialogFooter>
+                <Button variant="outline" onClick={closeCreateModal} disabled={isSubmitting}>
+                  Cancel
+                </Button>
+                <Button onClick={handleCreateCategoryAdmin} disabled={isSubmitting}>
+                  {isSubmitting ? "Creating..." : "Create Category Admin"}
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </AdminLayout>
