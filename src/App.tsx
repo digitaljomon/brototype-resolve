@@ -10,6 +10,7 @@ import { RoleBasedRedirect } from "@/components/RoleBasedRedirect";
 import Auth from "./pages/Auth";
 import StudentDashboard from "./pages/StudentDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import ComplaintsManagement from "./pages/ComplaintsManagement";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import ComplaintCategories from "./pages/ComplaintCategories";
 import UserManagement from "./pages/UserManagement";
@@ -56,7 +57,7 @@ const App = () => (
                 path="/admin/complaints"
                 element={
                   <ProtectedRoute requireAdmin>
-                    <AdminDashboard />
+                    <ComplaintsManagement />
                   </ProtectedRoute>
                 }
               />
