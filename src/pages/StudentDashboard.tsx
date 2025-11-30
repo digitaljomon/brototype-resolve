@@ -4,12 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Clock, CheckCircle, AlertCircle, Plus, ArrowRight } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LogOut, FileText, Clock, CheckCircle, AlertCircle, Plus, ArrowRight, Shield } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { format } from "date-fns";
 
 export default function StudentDashboard() {
-  const { user } = useAuth();
+  const { user, userRole, signOut } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     total: 0,
@@ -80,102 +81,134 @@ export default function StudentDashboard() {
   ];
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Welcome Back!</h1>
-        <p className="text-muted-foreground">Here's an overview of your complaints</p>
-      </div>
-
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      ) : (
-        <>
-          {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {kpiCards.map((card) => (
-              <Card key={card.title} className="glass-card hover:shadow-lg transition-all">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {card.title}
-                  </CardTitle>
-                  <div className={`p-2 rounded-lg ${card.bgColor}`}>
-                    <card.icon className={`h-5 w-5 ${card.color}`} />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{card.value}</div>
-                </CardContent>
-              </Card>
-            ))}
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+      {/* Header */}
+      <header className="border-b glass-card">
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+          <h1 className="text-2xl font-bold gradient-purple-blue gradient-text">
+            Brototype Complaints
+          </h1>
+          <div className="flex items-center gap-4">
+            {userRole === "admin" && (
+              <Button
+                onClick={() => navigate("/admin")}
+                variant="outline"
+                className="glass-card hover:bg-gradient-purple-blue hover:text-white transition-all"
+              >
+                <Shield className="mr-2 h-4 w-4" />
+                Admin Panel
+              </Button>
+            )}
+            <ThemeToggle />
+            <Button
+              onClick={signOut}
+              variant="outline"
+              size="icon"
+              className="glass-card hover:bg-destructive hover:text-white transition-all"
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
           </div>
+        </div>
+      </header>
 
-          {/* Quick Action Button */}
-          <Card className="mb-8 glass-card bg-gradient-to-br from-primary/10 via-primary/5 to-background">
-            <CardHeader>
-              <CardTitle className="text-2xl">Need Help?</CardTitle>
-              <CardDescription>File a new complaint and we'll assist you</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button
-                onClick={() => navigate("/dashboard/file-complaint")}
-                className="bg-gradient-purple-blue hover:opacity-90 text-white font-semibold px-8 py-6 text-lg shadow-lg"
-                size="lg"
-              >
-                <Plus className="mr-2 h-5 w-5" />
-                File a New Complaint
-              </Button>
-            </CardContent>
-          </Card>
+      <main className="container mx-auto px-6 py-8">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold mb-2">Welcome Back!</h2>
+          <p className="text-muted-foreground">Here's an overview of your complaints</p>
+        </div>
 
-          {/* Recent Complaints */}
-          <Card className="glass-card">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Recent Complaints</CardTitle>
-                <CardDescription>Your latest submissions</CardDescription>
-              </div>
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/dashboard/complaints")}
-                className="gap-2"
-              >
-                View All
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {recentComplaints.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">
-                  No complaints yet. Start by filing your first complaint!
-                </p>
-              ) : (
-                <div className="space-y-4">
-                  {recentComplaints.map((complaint) => (
-                    <div
-                      key={complaint.id}
-                      className="flex items-center justify-between p-4 rounded-lg border hover:bg-accent cursor-pointer transition-all"
-                      onClick={() => navigate(`/dashboard/complaint/${complaint.id}`)}
-                    >
-                      <div className="flex-1">
-                        <h4 className="font-semibold mb-1">{complaint.title}</h4>
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                          <span className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                            {complaint.categories?.name || "Uncategorized"}
-                          </span>
-                          <span>{format(new Date(complaint.created_at), "MMM d, yyyy")}</span>
-                        </div>
-                      </div>
-                      <StatusBadge status={complaint.status} />
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <>
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {kpiCards.map((card) => (
+                <Card key={card.title} className="glass-card hover:shadow-lg transition-all">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                      {card.title}
+                    </CardTitle>
+                    <div className={`p-2 rounded-lg ${card.bgColor}`}>
+                      <card.icon className={`h-5 w-5 ${card.color}`} />
                     </div>
-                  ))}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold">{card.value}</div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Quick Action Button */}
+            <Card className="mb-8 glass-card bg-gradient-to-br from-primary/10 via-primary/5 to-background">
+              <CardHeader>
+                <CardTitle className="text-2xl">Need Help?</CardTitle>
+                <CardDescription>File a new complaint and we'll assist you</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  onClick={() => navigate("/dashboard/file-complaint")}
+                  className="bg-gradient-purple-blue hover:opacity-90 text-white font-semibold px-8 py-6 text-lg shadow-lg"
+                  size="lg"
+                >
+                  <Plus className="mr-2 h-5 w-5" />
+                  File a New Complaint
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Recent Complaints */}
+            <Card className="glass-card">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Recent Complaints</CardTitle>
+                  <CardDescription>Your latest submissions</CardDescription>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </>
-      )}
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/dashboard/complaints")}
+                  className="gap-2"
+                >
+                  View All
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {recentComplaints.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    No complaints yet. Start by filing your first complaint!
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {recentComplaints.map((complaint) => (
+                      <div
+                        key={complaint.id}
+                        className="flex items-center justify-between p-4 rounded-lg border hover:bg-accent cursor-pointer transition-all"
+                        onClick={() => navigate(`/dashboard/complaint/${complaint.id}`)}
+                      >
+                        <div className="flex-1">
+                          <h4 className="font-semibold mb-1">{complaint.title}</h4>
+                          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                            <span className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                              {complaint.categories?.name || "Uncategorized"}
+                            </span>
+                            <span>{format(new Date(complaint.created_at), "MMM d, yyyy")}</span>
+                          </div>
+                        </div>
+                        <StatusBadge status={complaint.status} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </main>
     </div>
   );
 }
