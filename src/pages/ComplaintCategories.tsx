@@ -145,7 +145,8 @@ export default function ComplaintCategories() {
                 {categories.map((category) => (
                   <Badge
                     key={category.id}
-                    className="px-4 py-2 text-base bg-gradient-to-r from-primary/10 to-neon-blue/10 text-primary hover:from-primary/20 hover:to-neon-blue/20 border border-primary/20"
+                    variant="secondary"
+                    className="px-4 py-2 text-base hover:bg-secondary/80 transition-colors"
                   >
                     <span>{category.name}</span>
                     <button
