@@ -4,9 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { LogOut, Plus, Trash2, Bell, BarChart3 } from "lucide-react";
-import { NavLink } from "@/components/NavLink";
+import { Plus, Trash2 } from "lucide-react";
+import { AdminHeader } from "@/components/AdminHeader";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -181,48 +180,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      {/* Header */}
-      <header className="border-b glass-card">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <div>
-              <h1 className="text-2xl font-bold gradient-multi gradient-text">
-                Admin Dashboard
-              </h1>
-              {user && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  Logged in as: {user.email} ({userRole})
-                </p>
-              )}
-            </div>
-            <nav className="flex gap-2">
-              <NavLink to="/admin">Dashboard</NavLink>
-              <NavLink to="/admin/analytics">Analytics</NavLink>
-            </nav>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              size="icon"
-              className="glass-card hover:bg-primary/20 transition-all relative"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 bg-destructive rounded-full text-xs flex items-center justify-center text-white">
-                3
-              </span>
-            </Button>
-            <ThemeToggle />
-            <Button
-              onClick={signOut}
-              variant="outline"
-              size="icon"
-              className="glass-card hover:bg-destructive hover:text-white transition-all"
-            >
-              <LogOut className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </header>
+      <AdminHeader />
 
       <main className="container mx-auto px-6 py-8">
         {/* Stats Cards */}

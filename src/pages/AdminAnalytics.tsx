@@ -1,12 +1,8 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { NavLink } from "@/components/NavLink";
-import { LogOut, BarChart3, TrendingUp, Clock, AlertCircle } from "lucide-react";
+import { AdminHeader } from "@/components/AdminHeader";
+import { BarChart3, TrendingUp, Clock, AlertCircle } from "lucide-react";
 import { 
   BarChart, Bar, PieChart, Pie, LineChart, Line, 
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
@@ -14,8 +10,6 @@ import {
 } from "recharts";
 
 export default function AdminAnalytics() {
-  const { signOut, user } = useAuth();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [analyticsData, setAnalyticsData] = useState({
     statusDistribution: [],
@@ -131,11 +125,6 @@ export default function AdminAnalytics() {
     }
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/auth");
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -145,26 +134,8 @@ export default function AdminAnalytics() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <h1 className="text-2xl font-bold gradient-text">Admin Portal</h1>
-              <nav className="flex gap-2">
-                <NavLink to="/admin">Dashboard</NavLink>
-                <NavLink to="/admin/analytics">Analytics</NavLink>
-              </nav>
-            </div>
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
-              <Button onClick={handleSignOut} variant="ghost" size="icon">
-                <LogOut className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+      <AdminHeader />
 
       <main className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8">
