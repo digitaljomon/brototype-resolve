@@ -107,14 +107,14 @@ export default function StudentComplaints() {
   });
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">My Complaints</h1>
-        <p className="text-muted-foreground">View and track all your submitted complaints</p>
+    <div className="container mx-auto px-6 py-6">
+      <div className="mb-4">
+        <h1 className="text-2xl font-bold mb-1">My Complaints</h1>
+        <p className="text-sm text-muted-foreground">View and track all your submitted complaints</p>
       </div>
 
       {/* Filters */}
-      <Card className="p-6 mb-6 glass-card">
+      <Card className="p-4 mb-4 shadow-sm">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -156,33 +156,33 @@ export default function StudentComplaints() {
       </Card>
 
       {/* Table */}
-      <Card className="glass-card">
+      <Card className="shadow-lg">
         {loading ? (
-          <div className="flex justify-center py-12">
+          <div className="flex justify-center py-8">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : filteredComplaints.length === 0 ? (
-          <div className="p-12 text-center text-muted-foreground">
+          <div className="p-8 text-center text-sm text-muted-foreground">
             No complaints found matching your filters.
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-xs font-medium">Title</TableHead>
+                <TableHead className="text-xs font-medium">Category</TableHead>
+                <TableHead className="text-xs font-medium">Status</TableHead>
+                <TableHead className="text-xs font-medium">Priority</TableHead>
+                <TableHead className="text-xs font-medium">Date</TableHead>
+                <TableHead className="text-xs font-medium text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredComplaints.map((complaint) => (
                 <TableRow key={complaint.id} className="hover:bg-muted/50">
-                  <TableCell className="font-medium">{complaint.title}</TableCell>
+                  <TableCell className="font-medium text-sm">{complaint.title}</TableCell>
                   <TableCell>
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-gradient-blue-cyan text-white">
+                    <span className="px-2 py-1 rounded-full text-xs font-medium bg-gradient-blue-cyan text-white">
                       {complaint.categories?.name || "Uncategorized"}
                     </span>
                   </TableCell>
@@ -192,13 +192,13 @@ export default function StudentComplaints() {
                   <TableCell>
                     <PriorityBadge priority={complaint.priority} />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-sm">
                     {format(new Date(complaint.created_at), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="sm"
                       onClick={() => navigate(`/dashboard/complaint/${complaint.id}`)}
                     >
                       <Eye className="h-4 w-4" />
