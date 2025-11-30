@@ -6,13 +6,13 @@ interface PriorityBadgeProps {
 
 export const PriorityBadge = ({ priority }: PriorityBadgeProps) => {
   const variants = {
-    low: "bg-gradient-low text-white",
-    medium: "bg-gradient-medium text-foreground",
-    high: "bg-gradient-high text-white",
+    low: "bg-green-500 text-white",
+    medium: "bg-orange-500 text-white",
+    high: "bg-pink-500 text-white",
   };
 
   return (
-    <Badge className={`${variants[priority]} font-medium px-3 py-1 border-0`}>
+    <Badge className={`${variants[priority]} font-medium px-3 py-1 border-0 rounded-full shadow-sm`}>
       {priority.charAt(0).toUpperCase() + priority.slice(1)}
     </Badge>
   );
