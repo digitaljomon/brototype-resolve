@@ -17,6 +17,11 @@ export function StudentLayout({ children }: StudentLayoutProps) {
           <main className="flex-1 overflow-auto">
             {children}
           </main>
+          <footer className="border-t bg-card/50 backdrop-blur-sm py-3">
+            <p className="text-center text-xs text-muted-foreground">
+              All Rights Reserved. 2025. Developed by Jomon Joseph
+            </p>
+          </footer>
         </div>
       </div>
     </SidebarProvider>

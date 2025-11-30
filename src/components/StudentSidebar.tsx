@@ -31,7 +31,7 @@ export function StudentSidebar() {
       <SidebarContent className="bg-gradient-to-b from-primary/5 via-background to-background">
         <div className="p-4 border-b">
           <h2 className={`font-bold gradient-text bg-gradient-purple-blue ${isCollapsed ? "text-center text-xs" : "text-xl"}`}>
-            {isCollapsed ? "BC" : "Brototype"}
+            {isCollapsed ? "BR" : "Brototype Resolve"}
           </h2>
         </div>
 

@@ -54,12 +54,12 @@ export function AppSidebar() {
         <div className="px-4 py-6">
           <div className="flex items-center gap-3">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-electric-pink flex items-center justify-center">
-              <span className="text-white font-bold text-sm">CM</span>
+              <span className="text-white font-bold text-sm">BR</span>
             </div>
             {open && (
               <div>
-                <h1 className="font-bold text-lg text-sidebar-foreground">Complaint</h1>
-                <p className="text-xs text-muted-foreground">Management</p>
+                <h1 className="font-bold text-lg text-sidebar-foreground">Brototype</h1>
+                <p className="text-xs text-muted-foreground">Resolve</p>
               </div>
             )}
           </div>
