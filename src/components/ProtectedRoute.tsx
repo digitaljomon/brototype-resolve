@@ -27,12 +27,12 @@ export const ProtectedRoute = ({
   }
 
   // Redirect non-admins trying to access admin routes
-  if (requireAdmin && userRole !== "admin") {
+  if (requireAdmin && userRole !== "admin" && userRole !== "super_admin" && userRole !== "category_admin") {
     return <Navigate to="/dashboard" replace />;
   }
 
   // Redirect admins trying to access student-only routes
-  if (requireStudent && userRole === "admin") {
+  if (requireStudent && (userRole === "admin" || userRole === "super_admin" || userRole === "category_admin")) {
     return <Navigate to="/admin" replace />;
   }
 
