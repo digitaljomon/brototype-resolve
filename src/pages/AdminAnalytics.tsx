@@ -17,6 +17,7 @@ export default function AdminAnalytics() {
     priorityDistribution: [],
     complaintsOverTime: [],
     avgResolutionTime: 0,
+    adminCompletionData: [],
   });
 
   const COLORS = {
@@ -110,12 +111,56 @@ export default function AdminAnalytics() {
           avgTime = Math.round(totalTime / completedComplaints.length / (1000 * 60 * 60 * 24)); // Convert to days
         }
 
+        // Fetch category admin performance data
+        const { data: categoryAdmins, error: adminsError } = await supabase
+          .from("user_roles")
+          .select(`
+            user_id,
+            profiles!inner(name)
+          `)
+          .eq("role", "category_admin");
+
+        let adminData: any[] = [];
+        if (!adminsError && categoryAdmins) {
+          for (const admin of categoryAdmins) {
+            // Get assigned categories for this admin
+            const { data: assignments } = await supabase
+              .from("admin_category_assignments")
+              .select("category_id")
+              .eq("admin_id", admin.user_id);
+
+            if (assignments && assignments.length > 0) {
+              const categoryIds = assignments.map(a => a.category_id);
+              
+              // Get complaints in these categories
+              const adminComplaints = complaints.filter(c => 
+                c.category_id && categoryIds.includes(c.category_id)
+              );
+              
+              const total = adminComplaints.length;
+              const completed = adminComplaints.filter(c => c.status === 'completed').length;
+              const completion = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+              adminData.push({
+                name: admin.profiles?.name || 'Unknown',
+                completion,
+                total,
+                completed,
+              });
+            }
+          }
+
+          // Sort by completion rate (descending)
+          adminData.sort((a, b) => b.completion - a.completion);
+        }
+
         setAnalyticsData({
           statusDistribution: statusData,
           categoryDistribution: categoryData,
           priorityDistribution: priorityData,
           complaintsOverTime: timeData,
           avgResolutionTime: avgTime,
+          adminCompletionData: adminData,
         });
       }
     } catch (error) {
@@ -314,6 +359,67 @@ export default function AdminAnalytics() {
                   />
                 </LineChart>
               </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Category Admin Performance */}
+          <Card className="shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Category Admin Performance</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {analyticsData.adminCompletionData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart 
+                    data={analyticsData.adminCompletionData} 
+                    layout="vertical"
+                    margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      type="number" 
+                      domain={[0, 100]} 
+                      stroke="hsl(var(--foreground))" 
+                      fontSize={12}
+                      label={{ value: 'Completion %', position: 'insideBottom', offset: -5, fontSize: 12 }}
+                    />
+                    <YAxis 
+                      type="category" 
+                      dataKey="name" 
+                      stroke="hsl(var(--foreground))" 
+                      fontSize={12}
+                      width={75}
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                      }}
+                      formatter={(value: any, name: any, props: any) => {
+                        const { payload } = props;
+                        return [
+                          `${value}% (${payload.completed}/${payload.total})`,
+                          'Completion Rate'
+                        ];
+                      }}
+                    />
+                    <Bar dataKey="completion" radius={[0, 6, 6, 0]}>
+                      {analyticsData.adminCompletionData.map((entry: any, index: number) => {
+                        let fill = 'hsl(var(--chart-3))'; // Green for good
+                        if (entry.completion < 40) fill = 'hsl(var(--destructive))'; // Red for low
+                        else if (entry.completion < 70) fill = 'hsl(var(--chart-5))'; // Yellow for medium
+                        return <Cell key={`cell-${index}`} fill={fill} />;
+                      })}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[220px] text-muted-foreground text-sm">
+                  No category admins found
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
