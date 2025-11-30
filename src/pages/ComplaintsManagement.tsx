@@ -20,7 +20,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Trash2, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, Trash2, Search, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import * as XLSX from "xlsx";
 import { useToast } from "@/hooks/use-toast";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
@@ -173,6 +174,68 @@ export default function ComplaintsManagement() {
     setIsModalOpen(true);
   };
 
+  const exportToCSV = () => {
+    const csvData = filteredComplaints.map((complaint) => ({
+      Title: complaint.title,
+      Description: complaint.description,
+      Student: complaint.profiles?.name || "Unknown",
+      Email: complaint.profiles?.email || "N/A",
+      Category: complaint.categories?.name || "Uncategorized",
+      Priority: complaint.priority,
+      Status: complaint.status,
+      "Created At": format(new Date(complaint.created_at), "MMM d, yyyy HH:mm"),
+      "Updated At": format(new Date(complaint.updated_at), "MMM d, yyyy HH:mm"),
+    }));
+
+    const csvContent = [
+      Object.keys(csvData[0]).join(","),
+      ...csvData.map((row) =>
+        Object.values(row)
+          .map((val) => `"${String(val).replace(/"/g, '""')}"`)
+          .join(",")
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `complaints_${format(new Date(), "yyyy-MM-dd_HHmmss")}.csv`;
+    link.click();
+
+    toast({
+      title: "Export successful",
+      description: `${filteredComplaints.length} complaints exported to CSV`,
+    });
+  };
+
+  const exportToExcel = () => {
+    const excelData = filteredComplaints.map((complaint) => ({
+      Title: complaint.title,
+      Description: complaint.description,
+      Student: complaint.profiles?.name || "Unknown",
+      Email: complaint.profiles?.email || "N/A",
+      Category: complaint.categories?.name || "Uncategorized",
+      Priority: complaint.priority,
+      Status: complaint.status,
+      "Created At": format(new Date(complaint.created_at), "MMM d, yyyy HH:mm"),
+      "Updated At": format(new Date(complaint.updated_at), "MMM d, yyyy HH:mm"),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Complaints");
+
+    XLSX.writeFile(
+      workbook,
+      `complaints_${format(new Date(), "yyyy-MM-dd_HHmmss")}.xlsx`
+    );
+
+    toast({
+      title: "Export successful",
+      description: `${filteredComplaints.length} complaints exported to Excel`,
+    });
+  };
+
   const paginatedComplaints = filteredComplaints.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -218,6 +281,18 @@ export default function ComplaintsManagement() {
                   className="pl-10"
                 />
               </div>
+
+              {/* Export Button */}
+              <Select onValueChange={(value) => value === "csv" ? exportToCSV() : exportToExcel()}>
+                <SelectTrigger className="w-[140px]">
+                  <Download className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Export" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="csv">Export as CSV</SelectItem>
+                  <SelectItem value="excel">Export as Excel</SelectItem>
+                </SelectContent>
+              </Select>
 
               {/* Filters */}
               <div className="flex flex-wrap gap-3">
