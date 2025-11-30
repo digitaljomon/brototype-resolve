@@ -135,62 +135,62 @@ export default function AdminAnalytics() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Page Header */}
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-neon-blue to-neon-aqua flex items-center justify-center shadow-lg">
-            <BarChart3 className="h-6 w-6 text-white" />
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-neon-blue to-neon-aqua flex items-center justify-center shadow-lg">
+            <BarChart3 className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h2 className="text-3xl font-bold">Analytics</h2>
-            <p className="text-muted-foreground">Insights and statistics for complaints</p>
+            <h2 className="text-2xl font-bold">Analytics</h2>
+            <p className="text-sm text-muted-foreground">Insights and statistics for complaints</p>
           </div>
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="shadow-lg hover:shadow-xl transition-all overflow-hidden">
-            <div className="bg-gradient-to-br from-primary to-neon-blue p-6 text-white">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium opacity-90">Total</p>
-                <TrendingUp className="h-5 w-5" />
+            <div className="bg-gradient-to-br from-primary to-neon-blue p-4 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-medium opacity-90">Total</p>
+                <TrendingUp className="h-4 w-4" />
               </div>
-              <p className="text-4xl font-bold">
+              <p className="text-3xl font-bold">
                 {analyticsData.statusDistribution.reduce((sum: number, item: any) => sum + item.value, 0)}
               </p>
             </div>
           </Card>
 
           <Card className="shadow-lg hover:shadow-xl transition-all overflow-hidden">
-            <div className="bg-gradient-to-br from-green-500 to-emerald-500 p-6 text-white">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium opacity-90">Avg Resolution</p>
-                <Clock className="h-5 w-5" />
+            <div className="bg-gradient-to-br from-green-500 to-emerald-500 p-4 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-medium opacity-90">Avg Resolution</p>
+                <Clock className="h-4 w-4" />
               </div>
-              <p className="text-4xl font-bold">{analyticsData.avgResolutionTime}</p>
-              <p className="text-sm opacity-90 mt-1">days</p>
+              <p className="text-3xl font-bold">{analyticsData.avgResolutionTime}</p>
+              <p className="text-xs opacity-90 mt-1">days</p>
             </div>
           </Card>
 
           <Card className="shadow-lg hover:shadow-xl transition-all overflow-hidden">
-            <div className="bg-gradient-to-br from-red-500 to-pink-500 p-6 text-white">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium opacity-90">High Priority</p>
-                <AlertCircle className="h-5 w-5" />
+            <div className="bg-gradient-to-br from-red-500 to-pink-500 p-4 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-medium opacity-90">High Priority</p>
+                <AlertCircle className="h-4 w-4" />
               </div>
-              <p className="text-4xl font-bold">
+              <p className="text-3xl font-bold">
                 {analyticsData.priorityDistribution.find((p: any) => p.name === "High")?.value || 0}
               </p>
             </div>
           </Card>
 
           <Card className="shadow-lg hover:shadow-xl transition-all overflow-hidden">
-            <div className="bg-gradient-to-br from-neon-purple to-electric-pink p-6 text-white">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium opacity-90">Completion Rate</p>
-                <TrendingUp className="h-5 w-5" />
+            <div className="bg-gradient-to-br from-neon-purple to-electric-pink p-4 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-medium opacity-90">Completion Rate</p>
+                <TrendingUp className="h-4 w-4" />
               </div>
-              <p className="text-4xl font-bold">
+              <p className="text-3xl font-bold">
                 {(() => {
                   const total = analyticsData.statusDistribution.reduce((sum: number, item: any) => sum + item.value, 0);
                   const completed = analyticsData.statusDistribution.find((s: any) => s.name === "Completed")?.value || 0;
@@ -202,14 +202,14 @@ export default function AdminAnalytics() {
         </div>
 
         {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Status Distribution */}
-          <Card className="shadow-xl">
-            <CardHeader>
-              <CardTitle>Status Distribution</CardTitle>
+          <Card className="shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Status Distribution</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            <CardContent className="pt-0">
+              <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
                   <Pie
                     data={analyticsData.statusDistribution}
@@ -217,7 +217,7 @@ export default function AdminAnalytics() {
                     cy="50%"
                     labelLine={false}
                     label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={100}
+                    outerRadius={70}
                     dataKey="value"
                   >
                     {analyticsData.statusDistribution.map((entry: any, index: number) => (
@@ -231,24 +231,25 @@ export default function AdminAnalytics() {
           </Card>
 
           {/* Priority Distribution */}
-          <Card className="shadow-xl">
-            <CardHeader>
-              <CardTitle>Priority Distribution</CardTitle>
+          <Card className="shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Priority Distribution</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            <CardContent className="pt-0">
+              <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={analyticsData.priorityDistribution}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" stroke="hsl(var(--foreground))" />
-                  <YAxis stroke="hsl(var(--foreground))" />
+                  <XAxis dataKey="name" stroke="hsl(var(--foreground))" fontSize={12} />
+                  <YAxis stroke="hsl(var(--foreground))" fontSize={12} />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: 'hsl(var(--card))',
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '8px',
+                      fontSize: '12px',
                     }}
                   />
-                  <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                  <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                     {analyticsData.priorityDistribution.map((entry: any, index: number) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
@@ -259,12 +260,12 @@ export default function AdminAnalytics() {
           </Card>
 
           {/* Category Distribution */}
-          <Card className="shadow-xl">
-            <CardHeader>
-              <CardTitle>Category Distribution</CardTitle>
+          <Card className="shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Category Distribution</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            <CardContent className="pt-0">
+              <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
                   <Pie
                     data={analyticsData.categoryDistribution}
@@ -272,7 +273,7 @@ export default function AdminAnalytics() {
                     cy="50%"
                     labelLine={false}
                     label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={100}
+                    outerRadius={70}
                     dataKey="value"
                   >
                     {analyticsData.categoryDistribution.map((entry: any, index: number) => (
@@ -286,29 +287,30 @@ export default function AdminAnalytics() {
           </Card>
 
           {/* Complaints Over Time */}
-          <Card className="shadow-xl">
-            <CardHeader>
-              <CardTitle>Complaints Trend (Last 7 Days)</CardTitle>
+          <Card className="shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Complaints Trend (Last 7 Days)</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            <CardContent className="pt-0">
+              <ResponsiveContainer width="100%" height={220}>
                 <LineChart data={analyticsData.complaintsOverTime}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="date" stroke="hsl(var(--foreground))" />
-                  <YAxis stroke="hsl(var(--foreground))" />
+                  <XAxis dataKey="date" stroke="hsl(var(--foreground))" fontSize={12} />
+                  <YAxis stroke="hsl(var(--foreground))" fontSize={12} />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: 'hsl(var(--card))',
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '8px',
+                      fontSize: '12px',
                     }}
                   />
                   <Line 
                     type="monotone" 
                     dataKey="complaints" 
                     stroke="hsl(var(--primary))" 
-                    strokeWidth={3}
-                    dot={{ fill: 'hsl(var(--primary))', r: 5 }}
+                    strokeWidth={2}
+                    dot={{ fill: 'hsl(var(--primary))', r: 4 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
