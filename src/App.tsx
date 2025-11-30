@@ -43,65 +43,11 @@ const App = () => (
                 } 
               />
               <Route path="/auth" element={<Auth />} />
-              
-              {/* Student Routes with Layout */}
               <Route
                 path="/dashboard"
                 element={
                   <ProtectedRoute requireStudent>
-                    <StudentLayout>
-                      <StudentDashboard />
-                    </StudentLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/complaints"
-                element={
-                  <ProtectedRoute requireStudent>
-                    <StudentLayout>
-                      <StudentComplaints />
-                    </StudentLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/file-complaint"
-                element={
-                  <ProtectedRoute requireStudent>
-                    <StudentLayout>
-                      <FileComplaint />
-                    </StudentLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/notifications"
-                element={
-                  <ProtectedRoute requireStudent>
-                    <StudentLayout>
-                      <StudentNotifications />
-                    </StudentLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/profile"
-                element={
-                  <ProtectedRoute requireStudent>
-                    <StudentLayout>
-                      <StudentProfile />
-                    </StudentLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/help"
-                element={
-                  <ProtectedRoute requireStudent>
-                    <StudentLayout>
-                      <StudentHelp />
-                    </StudentLayout>
+                    <StudentDashboard />
                   </ProtectedRoute>
                 }
               />
