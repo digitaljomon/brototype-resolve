@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { ComplaintTimeline } from "@/components/ComplaintTimeline";
 import { ImageViewerModal } from "@/components/ImageViewerModal";
+import { ComplaintChat } from "@/components/ComplaintChat";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -224,9 +225,9 @@ export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate 
             </Select>
           </div>
 
-          {/* Tabs for Notes and Timeline */}
+          {/* Tabs for Notes, Timeline, and Messages */}
           <Tabs defaultValue="notes" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="notes" className="flex items-center gap-2">
                 <MessageSquare className="h-4 w-4" />
                 Internal Notes
@@ -234,6 +235,10 @@ export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate 
               <TabsTrigger value="timeline" className="flex items-center gap-2">
                 <History className="h-4 w-4" />
                 Timeline
+              </TabsTrigger>
+              <TabsTrigger value="messages" className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                Messages
               </TabsTrigger>
             </TabsList>
 
@@ -292,6 +297,10 @@ export function ComplaintDetailsModal({ complaint, open, onOpenChange, onUpdate 
 
             <TabsContent value="timeline" className="mt-4">
               <ComplaintTimeline complaintId={complaint.id} />
+            </TabsContent>
+
+            <TabsContent value="messages" className="mt-4">
+              <ComplaintChat complaintId={complaint.id} />
             </TabsContent>
           </Tabs>
         </div>

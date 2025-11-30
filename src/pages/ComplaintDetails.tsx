@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
+import { ComplaintChat } from "@/components/ComplaintChat";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, 
@@ -327,6 +328,9 @@ export default function ComplaintDetails() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Chat Card */}
+            <ComplaintChat complaintId={id!} />
           </div>
 
           {/* Sidebar */}
