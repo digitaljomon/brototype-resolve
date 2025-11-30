@@ -124,69 +124,68 @@ export default function StudentDashboard() {
   ];
 
   return (
-    <div className="container mx-auto px-6 py-8">
+    <div className="container mx-auto px-6 py-6">
       {/* Header Section */}
-      <div className="mb-8 flex items-start gap-4">
-        <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10">
-          <FileText className="h-8 w-8 text-primary" />
+      <div className="mb-4 flex items-center gap-3">
+        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-electric-pink flex items-center justify-center shadow-lg">
+          <FileText className="h-5 w-5 text-white" />
         </div>
         <div>
-          <h2 className="text-3xl font-bold mb-1">Dashboard Overview</h2>
-          <p className="text-muted-foreground">Monitor and manage your complaints</p>
+          <h2 className="text-2xl font-bold">Dashboard Overview</h2>
+          <p className="text-sm text-muted-foreground">Monitor and manage your complaints</p>
         </div>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12">
+        <div className="flex justify-center py-8">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : (
         <>
           {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
             {kpiCards.map((card) => (
               <Card 
                 key={card.title} 
-                className={`border-0 bg-gradient-to-br ${card.gradient} text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
+                className="shadow-lg hover:shadow-xl transition-all overflow-hidden"
               >
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="text-sm font-medium opacity-90">{card.title}</div>
-                    <div className={`p-2 rounded-full ${card.iconBg}`}>
-                      <card.icon className="h-5 w-5" />
-                    </div>
+                <div className={`bg-gradient-to-br ${card.gradient} p-4 text-white`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-medium opacity-90">{card.title}</p>
+                    <card.icon className="h-4 w-4" />
                   </div>
-                  <div className="text-5xl font-bold">{card.value}</div>
-                </CardContent>
+                  <p className="text-3xl font-bold">{card.value}</p>
+                </div>
               </Card>
             ))}
           </div>
 
           {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Recent Complaints - Takes 2 columns */}
-            <Card className="lg:col-span-2 shadow-sm">
-              <CardHeader className="border-b bg-muted/30">
+            <Card className="lg:col-span-2 shadow-lg">
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl font-semibold">Latest Complaints</CardTitle>
+                  <CardTitle className="text-lg">Latest Complaints</CardTitle>
                   <Button
                     variant="ghost"
+                    size="sm"
                     onClick={() => navigate("/dashboard/complaints")}
-                    className="gap-2 text-primary hover:text-primary"
+                    className="text-primary hover:text-primary/80"
                   >
-                    View All
-                    <ArrowRight className="h-4 w-4" />
+                    View All <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent className="pt-0">
                 {recentComplaints.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
-                      <FileText className="h-8 w-8 text-muted-foreground" />
+                  <div className="text-center py-8">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-3">
+                      <FileText className="h-6 w-6 text-muted-foreground" />
                     </div>
-                    <p className="text-muted-foreground mb-4">No complaints yet</p>
+                    <p className="text-sm text-muted-foreground mb-3">No complaints yet</p>
                     <Button
+                      size="sm"
                       onClick={() => navigate("/dashboard/file-complaint")}
                       className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
                     >
@@ -199,16 +198,14 @@ export default function StudentDashboard() {
                     {recentComplaints.map((complaint) => (
                       <div
                         key={complaint.id}
-                        className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/50 cursor-pointer transition-all duration-200 hover:shadow-md"
+                        className="flex items-start gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer"
                         onClick={() => navigate(`/dashboard/complaint/${complaint.id}`)}
                       >
-                        <div className="flex-1">
-                          <h4 className="font-semibold mb-2">{complaint.title}</h4>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span className="text-xs">
-                              {format(new Date(complaint.created_at), "MMM d, yyyy")}
-                            </span>
-                          </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate mb-1">{complaint.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(complaint.created_at), "MMM d, yyyy")}
+                          </p>
                         </div>
                         <StatusBadge status={complaint.status} />
                       </div>
@@ -219,48 +216,48 @@ export default function StudentDashboard() {
             </Card>
 
             {/* Right Sidebar Widgets */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Quick Action Card */}
-              <Card className="shadow-sm border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
-                <CardHeader>
-                  <CardTitle className="text-lg">Need Help?</CardTitle>
-                  <CardDescription>File a new complaint quickly</CardDescription>
+              <Card className="shadow-lg">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Quick Action</CardTitle>
+                  <CardDescription className="text-xs">File a new complaint</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                   <Button
                     onClick={() => navigate("/dashboard/file-complaint")}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white font-semibold py-6 shadow-lg"
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
                   >
-                    <Plus className="mr-2 h-5 w-5" />
-                    File a New Complaint
+                    <Plus className="mr-2 h-4 w-4" />
+                    File Complaint
                   </Button>
                 </CardContent>
               </Card>
 
               {/* Status Summary */}
-              <Card className="shadow-sm">
-                <CardHeader className="border-b bg-muted/30">
+              <Card className="shadow-lg">
+                <CardHeader className="pb-3">
                   <CardTitle className="text-lg">Status Summary</CardTitle>
                 </CardHeader>
-                <CardContent className="p-6 space-y-3">
+                <CardContent className="pt-0 space-y-3">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                      <span className="text-sm font-medium">Pending</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                      <span className="text-sm">Pending</span>
                     </div>
                     <span className="text-sm font-bold">{stats.pending}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 rounded-full bg-cyan-500"></div>
-                      <span className="text-sm font-medium">In Progress</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-cyan-500"></div>
+                      <span className="text-sm">In Progress</span>
                     </div>
                     <span className="text-sm font-bold">{stats.in_progress}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <span className="text-sm font-medium">Resolved</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                      <span className="text-sm">Resolved</span>
                     </div>
                     <span className="text-sm font-bold">{stats.resolved}</span>
                   </div>
