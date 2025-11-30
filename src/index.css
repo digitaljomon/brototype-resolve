@@ -149,12 +149,12 @@ All colors MUST be HSL.
     --input: 217.2 32.6% 17.5%;
     --ring: 262 83% 58%;
     
-    /* Sidebar colors for dark mode */
-    --sidebar: 222.2 47% 11%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-accent: 262 83% 58%;
-    --sidebar-accent-foreground: 210 40% 98%;
+    /* Optimized Sidebar colors for dark mode */
+    --sidebar: 220 30% 8%;
+    --sidebar-foreground: 210 40% 92%;
+    --sidebar-border: 220 25% 15%;
+    --sidebar-accent: 262 85% 62%;
+    --sidebar-accent-foreground: 0 0% 100%;
 
     --card: 217 32% 17%;
     --card-foreground: 210 40% 98%;
@@ -205,21 +205,21 @@ All colors MUST be HSL.
     --glass-bg: rgba(30, 30, 40, 0.6);
     --glass-border: rgba(255, 255, 255, 0.1);
 
-    /* Sidebar - Dark */
-    --sidebar-background: 222.2 47% 11%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 262 83% 58%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 262 83% 58%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-ring: 262 83% 58%;
+    /* Optimized Sidebar - Dark */
+    --sidebar-background: 220 30% 8%;
+    --sidebar-foreground: 210 40% 92%;
+    --sidebar-primary: 262 85% 62%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 262 85% 62%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 25% 15%;
+    --sidebar-ring: 262 85% 62%;
     --chart-1: 199 95% 73%;
     --chart-2: 211 96% 78%;
     --chart-3: 215 20% 65%;
     --chart-4: 215 16% 46%;
     --chart-5: 215 19% 34%;
-    --sidebar: 217 32% 17%;
+    --sidebar: 220 30% 8%;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
