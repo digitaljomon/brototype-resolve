@@ -10,6 +10,7 @@ import { RoleBasedRedirect } from "@/components/RoleBasedRedirect";
 import Auth from "./pages/Auth";
 import StudentDashboard from "./pages/StudentDashboard";
 import StudentComplaints from "./pages/StudentComplaints";
+import ComplaintDetails from "./pages/ComplaintDetails";
 import FileComplaint from "./pages/FileComplaint";
 import StudentNotifications from "./pages/StudentNotifications";
 import StudentProfile from "./pages/StudentProfile";
@@ -63,6 +64,14 @@ function App() {
                       <SimpleStudentLayout>
                         <StudentComplaints />
                       </SimpleStudentLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/complaint/:id"
+                  element={
+                    <ProtectedRoute requireStudent>
+                      <ComplaintDetails />
                     </ProtectedRoute>
                   }
                 />
