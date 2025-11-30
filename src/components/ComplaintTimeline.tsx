@@ -26,6 +26,12 @@ const STATUS_STAGES = [
   { key: 'closed', label: 'Closed' },
 ];
 
+// Map old statuses to new timeline stages for backwards compatibility
+const STATUS_MAP: Record<string, string> = {
+  'ongoing': 'in_progress',
+  'completed': 'closed'
+};
+
 interface ComplaintTimelineProps {
   complaintId: string;
 }
@@ -49,7 +55,9 @@ export function ComplaintTimeline({ complaintId }: ComplaintTimelineProps) {
         .single();
 
       if (complaintData) {
-        setCurrentStatus(complaintData.status);
+        // Map old status to new timeline status
+        const mappedStatus = STATUS_MAP[complaintData.status] || complaintData.status;
+        setCurrentStatus(mappedStatus);
       }
 
       // Fetch complaint history
@@ -90,7 +98,9 @@ export function ComplaintTimeline({ complaintId }: ComplaintTimelineProps) {
       // Process history data
       historyData?.forEach((item) => {
         if (item.change_type === 'status_change' || item.change_type === 'created') {
-          const status = item.new_value || 'pending';
+          const rawStatus = item.new_value || 'pending';
+          // Map old status to new timeline status
+          const status = STATUS_MAP[rawStatus] || rawStatus;
           const stage = stageMap.get(status);
           if (stage && !stage.timestamp) {
             stage.timestamp = item.created_at;
@@ -107,7 +117,9 @@ export function ComplaintTimeline({ complaintId }: ComplaintTimelineProps) {
                        (h.change_type === 'status_change' || h.change_type === 'created'))
           ?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
         
-        const status = statusAtTime?.new_value || 'pending';
+        const rawStatus = statusAtTime?.new_value || 'pending';
+        // Map old status to new timeline status
+        const status = STATUS_MAP[rawStatus] || rawStatus;
         const stage = stageMap.get(status);
         if (stage) {
           stage.notes.push({
