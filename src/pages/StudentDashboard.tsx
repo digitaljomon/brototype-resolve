@@ -9,6 +9,7 @@ import { LogOut, Plus, Shield } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { ComplaintForm } from "@/components/ComplaintForm";
+import { StudentComplaintDetailsModal } from "@/components/StudentComplaintDetailsModal";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,6 +20,8 @@ export default function StudentDashboard() {
   const [complaints, setComplaints] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchComplaints();
@@ -145,11 +148,18 @@ export default function StudentDashboard() {
         ) : (
           <div className="grid gap-6">
             {complaints.map((complaint) => (
-              <Card key={complaint.id} className="p-6 glass-card hover:shadow-xl transition-all duration-300 border-2">
+              <Card 
+                key={complaint.id} 
+                className="p-6 glass-card hover:shadow-xl transition-all duration-300 border-2 cursor-pointer"
+                onClick={() => {
+                  setSelectedComplaint(complaint);
+                  setIsDetailsModalOpen(true);
+                }}
+              >
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h3 className="text-xl font-bold mb-2">{complaint.title}</h3>
-                    <p className="text-muted-foreground mb-4">{complaint.description}</p>
+                    <p className="text-muted-foreground mb-4 line-clamp-2">{complaint.description}</p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <StatusBadge status={complaint.status} />
@@ -167,6 +177,15 @@ export default function StudentDashboard() {
               </Card>
             ))}
           </div>
+        )}
+
+        {/* Student Complaint Details Modal */}
+        {selectedComplaint && (
+          <StudentComplaintDetailsModal
+            complaint={selectedComplaint}
+            open={isDetailsModalOpen}
+            onOpenChange={setIsDetailsModalOpen}
+          />
         )}
       </main>
     </div>

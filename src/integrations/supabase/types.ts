@@ -32,6 +32,54 @@ export type Database = {
         }
         Relationships: []
       }
+      complaint_history: {
+        Row: {
+          change_type: string
+          changed_by: string
+          complaint_id: string
+          created_at: string
+          id: string
+          new_value: string | null
+          note: string | null
+          old_value: string | null
+        }
+        Insert: {
+          change_type: string
+          changed_by: string
+          complaint_id: string
+          created_at?: string
+          id?: string
+          new_value?: string | null
+          note?: string | null
+          old_value?: string | null
+        }
+        Update: {
+          change_type?: string
+          changed_by?: string
+          complaint_id?: string
+          created_at?: string
+          id?: string
+          new_value?: string | null
+          note?: string | null
+          old_value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complaint_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "complaint_history_complaint_id_fkey"
+            columns: ["complaint_id"]
+            isOneToOne: false
+            referencedRelation: "complaints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       complaint_notes: {
         Row: {
           admin_id: string
