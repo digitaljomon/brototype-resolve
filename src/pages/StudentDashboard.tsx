@@ -3,191 +3,179 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { LogOut, Plus, Shield } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileText, Clock, CheckCircle, AlertCircle, Plus, ArrowRight } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
-import { PriorityBadge } from "@/components/PriorityBadge";
-import { ComplaintForm } from "@/components/ComplaintForm";
-import { StudentComplaintDetailsModal } from "@/components/StudentComplaintDetailsModal";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
 
 export default function StudentDashboard() {
-  const { user, userRole, signOut } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [complaints, setComplaints] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    in_progress: 0,
+    resolved: 0,
+  });
+  const [recentComplaints, setRecentComplaints] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchComplaints();
-    setupRealtimeSubscription();
+    fetchData();
   }, [user]);
 
-  const fetchComplaints = async () => {
+  const fetchData = async () => {
     if (!user) return;
 
     const { data, error } = await supabase
       .from("complaints")
       .select(`
         *,
-        categories (name),
-        profiles (name, email)
+        categories (name)
       `)
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      setComplaints(data);
+      setStats({
+        total: data.length,
+        pending: data.filter((c) => c.status === "pending").length,
+        in_progress: data.filter((c) => c.status === "in_progress").length,
+        resolved: data.filter((c) => c.status === "resolved").length,
+      });
+      setRecentComplaints(data.slice(0, 5));
     }
     setLoading(false);
   };
 
-  const setupRealtimeSubscription = () => {
-    const channel = supabase
-      .channel("student-complaints")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "complaints",
-          filter: `user_id=eq.${user?.id}`,
-        },
-        (payload) => {
-          console.log("Realtime update:", payload);
-          fetchComplaints();
-          
-          if (payload.eventType === "UPDATE") {
-            toast({
-              title: "Status Updated",
-              description: "Your complaint status has been updated by admin",
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  };
-
-  const handleComplaintSubmitted = () => {
-    setIsDialogOpen(false);
-    fetchComplaints();
-    toast({
-      title: "Success!",
-      description: "Your complaint has been submitted",
-    });
-  };
+  const kpiCards = [
+    {
+      title: "Total Complaints",
+      value: stats.total,
+      icon: FileText,
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/10",
+    },
+    {
+      title: "Pending",
+      value: stats.pending,
+      icon: Clock,
+      color: "text-yellow-500",
+      bgColor: "bg-yellow-500/10",
+    },
+    {
+      title: "In Progress",
+      value: stats.in_progress,
+      icon: AlertCircle,
+      color: "text-orange-500",
+      bgColor: "bg-orange-500/10",
+    },
+    {
+      title: "Resolved",
+      value: stats.resolved,
+      icon: CheckCircle,
+      color: "text-green-500",
+      bgColor: "bg-green-500/10",
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      {/* Header */}
-      <header className="border-b glass-card">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold gradient-purple-blue gradient-text">
-            Brototype Complaints
-          </h1>
-          <div className="flex items-center gap-4">
-            {userRole === "admin" && (
-              <Button
-                onClick={() => navigate("/admin")}
-                variant="outline"
-                className="glass-card hover:bg-gradient-purple-blue hover:text-white transition-all"
-              >
-                <Shield className="mr-2 h-4 w-4" />
-                Admin Panel
-              </Button>
-            )}
-            <ThemeToggle />
-            <Button
-              onClick={signOut}
-              variant="outline"
-              size="icon"
-              className="glass-card hover:bg-destructive hover:text-white transition-all"
-            >
-              <LogOut className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="container mx-auto px-6 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Welcome Back!</h1>
+        <p className="text-muted-foreground">Here's an overview of your complaints</p>
+      </div>
 
-      <main className="container mx-auto px-6 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-3xl font-bold mb-2">My Complaints</h2>
-            <p className="text-muted-foreground">Track and manage your submitted complaints</p>
-          </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-purple-blue hover:opacity-90 text-white font-semibold px-6 py-6 text-lg shadow-lg">
-                <Plus className="mr-2 h-5 w-5" />
-                New Complaint
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <ComplaintForm onSuccess={handleComplaintSubmitted} />
-            </DialogContent>
-          </Dialog>
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
-
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        ) : complaints.length === 0 ? (
-          <Card className="p-12 text-center glass-card">
-            <p className="text-muted-foreground text-lg">No complaints yet. Click "New Complaint" to get started.</p>
-          </Card>
-        ) : (
-          <div className="grid gap-6">
-            {complaints.map((complaint) => (
-              <Card 
-                key={complaint.id} 
-                className="p-6 glass-card hover:shadow-xl transition-all duration-300 border-2 cursor-pointer"
-                onClick={() => {
-                  setSelectedComplaint(complaint);
-                  setIsDetailsModalOpen(true);
-                }}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">{complaint.title}</h3>
-                    <p className="text-muted-foreground mb-4 line-clamp-2">{complaint.description}</p>
+      ) : (
+        <>
+          {/* KPI Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {kpiCards.map((card) => (
+              <Card key={card.title} className="glass-card hover:shadow-lg transition-all">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    {card.title}
+                  </CardTitle>
+                  <div className={`p-2 rounded-lg ${card.bgColor}`}>
+                    <card.icon className={`h-5 w-5 ${card.color}`} />
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <StatusBadge status={complaint.status} />
-                    <PriorityBadge priority={complaint.priority} />
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span className="bg-gradient-blue-cyan px-3 py-1 rounded-full text-white font-medium">
-                    {complaint.categories?.name || "Uncategorized"}
-                  </span>
-                  <span>
-                    {new Date(complaint.created_at).toLocaleDateString()}
-                  </span>
-                </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">{card.value}</div>
+                </CardContent>
               </Card>
             ))}
           </div>
-        )}
 
-        {/* Student Complaint Details Modal */}
-        {selectedComplaint && (
-          <StudentComplaintDetailsModal
-            complaint={selectedComplaint}
-            open={isDetailsModalOpen}
-            onOpenChange={setIsDetailsModalOpen}
-          />
-        )}
-      </main>
+          {/* Quick Action Button */}
+          <Card className="mb-8 glass-card bg-gradient-to-br from-primary/10 via-primary/5 to-background">
+            <CardHeader>
+              <CardTitle className="text-2xl">Need Help?</CardTitle>
+              <CardDescription>File a new complaint and we'll assist you</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={() => navigate("/dashboard/file-complaint")}
+                className="bg-gradient-purple-blue hover:opacity-90 text-white font-semibold px-8 py-6 text-lg shadow-lg"
+                size="lg"
+              >
+                <Plus className="mr-2 h-5 w-5" />
+                File a New Complaint
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Recent Complaints */}
+          <Card className="glass-card">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Recent Complaints</CardTitle>
+                <CardDescription>Your latest submissions</CardDescription>
+              </div>
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/dashboard/complaints")}
+                className="gap-2"
+              >
+                View All
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {recentComplaints.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  No complaints yet. Start by filing your first complaint!
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {recentComplaints.map((complaint) => (
+                    <div
+                      key={complaint.id}
+                      className="flex items-center justify-between p-4 rounded-lg border hover:bg-accent cursor-pointer transition-all"
+                      onClick={() => navigate(`/dashboard/complaint/${complaint.id}`)}
+                    >
+                      <div className="flex-1">
+                        <h4 className="font-semibold mb-1">{complaint.title}</h4>
+                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                          <span className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                            {complaint.categories?.name || "Uncategorized"}
+                          </span>
+                          <span>{format(new Date(complaint.created_at), "MMM d, yyyy")}</span>
+                        </div>
+                      </div>
+                      <StatusBadge status={complaint.status} />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 }
