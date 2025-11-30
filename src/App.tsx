@@ -106,46 +106,8 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-                <Route
-                  path="/dashboard/complaints"
-                  element={
-                    <ProtectedRoute requireStudent>
-                      <StudentComplaints />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/file-complaint"
-                  element={
-                    <ProtectedRoute requireStudent>
-                      <FileComplaint />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/notifications"
-                  element={
-                    <ProtectedRoute requireStudent>
-                      <StudentNotifications />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/profile"
-                  element={
-                    <ProtectedRoute requireStudent>
-                      <StudentProfile />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/help"
-                  element={
-                    <ProtectedRoute requireStudent>
-                      <StudentHelp />
-                    </ProtectedRoute>
-                  }
-                />
+                
+                {/* Admin Routes */}
                 <Route
                   path="/admin"
                   element={
