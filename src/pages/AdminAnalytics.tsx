@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AdminHeader } from "@/components/AdminHeader";
+import { AdminLayout } from "@/components/AdminLayout";
 import { BarChart3, TrendingUp, Clock, AlertCircle } from "lucide-react";
 import { 
   BarChart, Bar, PieChart, Pie, LineChart, Line, 
@@ -134,78 +134,77 @@ export default function AdminAnalytics() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <AdminHeader />
-
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-8">
-          <BarChart3 className="h-8 w-8 text-primary" />
-          <h2 className="text-3xl font-bold">Complaint Analytics</h2>
+    <AdminLayout>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex items-center gap-3">
+          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-neon-blue to-neon-aqua flex items-center justify-center shadow-lg">
+            <BarChart3 className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold">Analytics</h2>
+            <p className="text-muted-foreground">Insights and statistics for complaints</p>
+          </div>
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="gradient-primary text-white">
-            <CardHeader>
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                Total Complaints
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="shadow-lg hover:shadow-xl transition-all overflow-hidden">
+            <div className="bg-gradient-to-br from-primary to-neon-blue p-6 text-white">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium opacity-90">Total</p>
+                <TrendingUp className="h-5 w-5" />
+              </div>
+              <p className="text-4xl font-bold">
                 {analyticsData.statusDistribution.reduce((sum: number, item: any) => sum + item.value, 0)}
+              </p>
+            </div>
+          </Card>
+
+          <Card className="shadow-lg hover:shadow-xl transition-all overflow-hidden">
+            <div className="bg-gradient-to-br from-green-500 to-emerald-500 p-6 text-white">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium opacity-90">Avg Resolution</p>
+                <Clock className="h-5 w-5" />
               </div>
-            </CardContent>
+              <p className="text-4xl font-bold">{analyticsData.avgResolutionTime}</p>
+              <p className="text-sm opacity-90 mt-1">days</p>
+            </div>
           </Card>
 
-          <Card className="gradient-completed text-white">
-            <CardHeader>
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                Avg Resolution Time
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{analyticsData.avgResolutionTime}</div>
-              <p className="text-sm opacity-90">days</p>
-            </CardContent>
-          </Card>
-
-          <Card className="gradient-high text-white">
-            <CardHeader>
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <AlertCircle className="h-4 w-4" />
-                High Priority
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
+          <Card className="shadow-lg hover:shadow-xl transition-all overflow-hidden">
+            <div className="bg-gradient-to-br from-red-500 to-pink-500 p-6 text-white">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium opacity-90">High Priority</p>
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              <p className="text-4xl font-bold">
                 {analyticsData.priorityDistribution.find((p: any) => p.name === "High")?.value || 0}
-              </div>
-            </CardContent>
+              </p>
+            </div>
           </Card>
 
-          <Card className="gradient-ongoing text-white">
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
+          <Card className="shadow-lg hover:shadow-xl transition-all overflow-hidden">
+            <div className="bg-gradient-to-br from-neon-purple to-electric-pink p-6 text-white">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium opacity-90">Completion Rate</p>
+                <TrendingUp className="h-5 w-5" />
+              </div>
+              <p className="text-4xl font-bold">
                 {(() => {
                   const total = analyticsData.statusDistribution.reduce((sum: number, item: any) => sum + item.value, 0);
                   const completed = analyticsData.statusDistribution.find((s: any) => s.name === "Completed")?.value || 0;
                   return total > 0 ? Math.round((completed / total) * 100) : 0;
                 })()}%
-              </div>
-            </CardContent>
+              </p>
+            </div>
           </Card>
         </div>
 
         {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Status Distribution */}
-          <Card>
+          <Card className="shadow-xl">
             <CardHeader>
               <CardTitle>Status Distribution</CardTitle>
             </CardHeader>
@@ -232,7 +231,7 @@ export default function AdminAnalytics() {
           </Card>
 
           {/* Priority Distribution */}
-          <Card>
+          <Card className="shadow-xl">
             <CardHeader>
               <CardTitle>Priority Distribution</CardTitle>
             </CardHeader>
@@ -260,7 +259,7 @@ export default function AdminAnalytics() {
           </Card>
 
           {/* Category Distribution */}
-          <Card>
+          <Card className="shadow-xl">
             <CardHeader>
               <CardTitle>Category Distribution</CardTitle>
             </CardHeader>
@@ -287,7 +286,7 @@ export default function AdminAnalytics() {
           </Card>
 
           {/* Complaints Over Time */}
-          <Card>
+          <Card className="shadow-xl">
             <CardHeader>
               <CardTitle>Complaints Trend (Last 7 Days)</CardTitle>
             </CardHeader>
@@ -308,15 +307,15 @@ export default function AdminAnalytics() {
                     type="monotone" 
                     dataKey="complaints" 
                     stroke="hsl(var(--primary))" 
-                    strokeWidth={2}
-                    dot={{ fill: 'hsl(var(--primary))', r: 4 }}
+                    strokeWidth={3}
+                    dot={{ fill: 'hsl(var(--primary))', r: 5 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
         </div>
-      </main>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

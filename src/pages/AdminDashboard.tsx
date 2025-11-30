@@ -3,9 +3,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Plus, Trash2 } from "lucide-react";
-import { AdminHeader } from "@/components/AdminHeader";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, Trash2, FileText, AlertCircle, Clock, CheckCircle2 } from "lucide-react";
+import { AdminLayout } from "@/components/AdminLayout";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ComplaintDetailsModal } from "@/components/ComplaintDetailsModal";
+import { Badge } from "@/components/ui/badge";
 
 export default function AdminDashboard() {
   const { signOut, user, userRole } = useAuth();
@@ -214,96 +215,139 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <AdminHeader />
+    <AdminLayout>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex items-center gap-3">
+          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-electric-pink flex items-center justify-center shadow-lg">
+            <FileText className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold">Admin Dashboard</h2>
+            <p className="text-muted-foreground">Manage complaints and categories</p>
+          </div>
+        </div>
 
-      <main className="container mx-auto px-6 py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-          <Card className="p-6 border-2 gradient-purple-blue text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <p className="text-sm opacity-90 mb-3 font-medium">Total Complaints</p>
-            <p className="text-5xl font-bold tracking-tight">{stats.total}</p>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+            <div className="bg-gradient-to-br from-primary to-neon-blue p-6 text-white">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium opacity-90">Total</p>
+                <FileText className="h-5 w-5" />
+              </div>
+              <p className="text-4xl font-bold tracking-tight">{stats.total}</p>
+            </div>
           </Card>
-          <Card className="p-6 border-2 gradient-pending text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <p className="text-sm opacity-90 mb-3 font-medium">Pending</p>
-            <p className="text-5xl font-bold tracking-tight">{stats.pending}</p>
+
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+            <div className="bg-gradient-to-br from-yellow-500 to-orange-500 p-6 text-white">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium opacity-90">Pending</p>
+                <Clock className="h-5 w-5" />
+              </div>
+              <p className="text-4xl font-bold tracking-tight">{stats.pending}</p>
+            </div>
           </Card>
-          <Card className="p-6 border-2 gradient-ongoing text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <p className="text-sm opacity-90 mb-3 font-medium">Ongoing</p>
-            <p className="text-5xl font-bold tracking-tight">{stats.ongoing}</p>
+
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+            <div className="bg-gradient-to-br from-neon-blue to-neon-aqua p-6 text-white">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium opacity-90">Ongoing</p>
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              <p className="text-4xl font-bold tracking-tight">{stats.ongoing}</p>
+            </div>
           </Card>
-          <Card className="p-6 border-2 gradient-completed text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <p className="text-sm opacity-90 mb-3 font-medium">Completed</p>
-            <p className="text-5xl font-bold tracking-tight">{stats.completed}</p>
+
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+            <div className="bg-gradient-to-br from-green-500 to-emerald-500 p-6 text-white">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium opacity-90">Completed</p>
+                <CheckCircle2 className="h-5 w-5" />
+              </div>
+              <p className="text-4xl font-bold tracking-tight">{stats.completed}</p>
+            </div>
           </Card>
-          <Card className="p-6 border-2 gradient-high text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <p className="text-sm opacity-90 mb-3 font-medium">High Priority</p>
-            <p className="text-5xl font-bold tracking-tight">{stats.high}</p>
+
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+            <div className="bg-gradient-to-br from-red-500 to-pink-500 p-6 text-white">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium opacity-90">High Priority</p>
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              <p className="text-4xl font-bold tracking-tight">{stats.high}</p>
+            </div>
           </Card>
         </div>
 
         {/* Categories Management */}
-        <Card className="p-6 glass-card mb-8 border-2 shadow-lg">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold gradient-pink-purple gradient-text">
-              Manage Categories
-            </h2>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-pink-purple text-white">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Category
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Category</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="categoryName">Category Name</Label>
-                    <Input
-                      id="categoryName"
-                      value={newCategory}
-                      onChange={(e) => setNewCategory(e.target.value)}
-                      placeholder="Enter category name"
-                      className="glass-card"
-                    />
-                  </div>
-                  <Button
-                    onClick={addCategory}
-                    className="w-full bg-gradient-pink-purple text-white"
-                  >
+        <Card className="shadow-xl">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl">Categories</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">Manage complaint categories</p>
+              </div>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-gradient-to-r from-primary to-neon-blue hover:opacity-90 transition-opacity">
+                    <Plus className="mr-2 h-4 w-4" />
                     Add Category
                   </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {categories.map((category) => (
-              <div
-                key={category.id}
-                className="flex items-center gap-2 bg-gradient-blue-cyan text-white px-4 py-2 rounded-full font-medium"
-              >
-                <span>{category.name}</span>
-                <button
-                  onClick={() => deleteCategory(category.id)}
-                  className="hover:bg-white/20 rounded-full p-1 transition-all"
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Category</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="categoryName">Category Name</Label>
+                      <Input
+                        id="categoryName"
+                        value={newCategory}
+                        onChange={(e) => setNewCategory(e.target.value)}
+                        placeholder="Enter category name"
+                      />
+                    </div>
+                    <Button
+                      onClick={addCategory}
+                      className="w-full bg-gradient-to-r from-primary to-neon-blue hover:opacity-90"
+                    >
+                      Add Category
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-3">
+              {categories.map((category) => (
+                <Badge
+                  key={category.id}
+                  className="px-4 py-2 text-base bg-gradient-to-r from-primary/10 to-neon-blue/10 text-primary hover:from-primary/20 hover:to-neon-blue/20 border border-primary/20"
                 >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            ))}
-          </div>
+                  <span>{category.name}</span>
+                  <button
+                    onClick={() => deleteCategory(category.id)}
+                    className="ml-2 hover:bg-destructive/20 rounded-full p-1 transition-all"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
         </Card>
 
         {/* Complaints Table */}
-        <Card className="glass-card border-2 shadow-lg">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-6 gradient-blue-cyan gradient-text">
-              All Complaints
-            </h2>
+        <Card className="shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-2xl">All Complaints</CardTitle>
+            <p className="text-sm text-muted-foreground">View and manage all submitted complaints</p>
+          </CardHeader>
+          <CardContent>
             {loading ? (
               <div className="flex justify-center py-12">
                 <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -337,9 +381,9 @@ export default function AdminDashboard() {
                         </TableCell>
                         <TableCell>{complaint.profiles?.name}</TableCell>
                         <TableCell>
-                          <span className="bg-gradient-blue-cyan px-3 py-1 rounded-full text-white text-sm">
+                          <Badge variant="secondary">
                             {complaint.categories?.name || "N/A"}
-                          </span>
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           <PriorityBadge priority={complaint.priority} />
@@ -351,13 +395,16 @@ export default function AdminDashboard() {
                               updateStatus(complaint.id, value)
                             }
                           >
-                            <SelectTrigger className="w-36 glass-card">
+                            <SelectTrigger className="w-36">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="ongoing">Ongoing</SelectItem>
-                              <SelectItem value="completed">Completed</SelectItem>
+                              <SelectItem value="verified">Verified</SelectItem>
+                              <SelectItem value="assigned">Assigned</SelectItem>
+                              <SelectItem value="in_progress">In Progress</SelectItem>
+                              <SelectItem value="resolved">Resolved</SelectItem>
+                              <SelectItem value="closed">Closed</SelectItem>
                             </SelectContent>
                           </Select>
                         </TableCell>
@@ -383,7 +430,7 @@ export default function AdminDashboard() {
                 </Table>
               </div>
             )}
-          </div>
+          </CardContent>
         </Card>
 
         {/* Complaint Details Modal */}
@@ -417,7 +464,7 @@ export default function AdminDashboard() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </main>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
