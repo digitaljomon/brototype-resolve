@@ -1,4 +1,6 @@
-Complaint Management System – Student, Super Admin & Category Admin Dashboards
+#Brototype Complaint Managament System | Resolve
+
+Cant compltete the project due to the credidit limitation of Lovable
 
 A modern web application designed to simplify and streamline the complaint-handling process inside institutes or organizations.
 This system brings together students, super admins, and category-wise admins, offering each a tailored dashboard and workflow through a clean sidebar-based interface.
