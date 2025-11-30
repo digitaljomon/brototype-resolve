@@ -42,7 +42,7 @@ export function SimpleStudentLayout({ children }: SimpleStudentLayoutProps) {
           {/* Logo */}
           <div className="p-6 border-b">
             <h2 className="text-2xl font-bold gradient-text bg-gradient-purple-blue">
-              Brototype
+              Brototype Resolve
             </h2>
           </div>
 
@@ -133,6 +133,13 @@ export function SimpleStudentLayout({ children }: SimpleStudentLayoutProps) {
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto">{children}</main>
+
+        {/* Footer */}
+        <footer className="border-t bg-card/50 backdrop-blur-sm py-3">
+          <p className="text-center text-xs text-muted-foreground">
+            All Rights Reserved. 2025. Developed by Jomon Joseph
+          </p>
+        </footer>
       </div>
     </div>
   );
